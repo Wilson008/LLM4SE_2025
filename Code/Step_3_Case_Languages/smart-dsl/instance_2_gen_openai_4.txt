@@ -1,17 +1,22 @@
-To modify Instance 1 so that it conforms to Grammar 2, let's first analyze the differences between Grammar 1 and Grammar 2:
+Differences between Grammar 1 and Grammar 2 (relevant to evolving the instance):
 
-1. **Replaced Rule:** 
-   - In Grammar 2, the `Modifier` rule has been replaced by the `Validator` rule with similar structure.
+1. **`Modifier` rule renamed to `Validator`**
+   - Grammar 1: `Modifier: 'Modifier' ...`
+   - Grammar 2: `Validator: 'validator' ...`
+   - Keyword changes from **`'Modifier'`** to **`'validator'`**, and the collected elements in `Contract` change from `modifiers+=Modifier` to `validators+=Validator`.
 
-2. **Additional Rule:** 
-   - Grammar 2 introduces a new rule `DataStore`, which is not used in Instance 2 as per your instructions because it's optional.
+2. **`Method` references changed accordingly**
+   - Grammar 1 method block: `modifiersKeyword='modifiers:' modifiers+=[Modifier] ...`
+   - Grammar 2 method block: `modifiersKeyword='validators:' validators+=[Validator] ...`
+   - So **`modifiers:`** becomes **`validators:`**, and references must point to `Validator` names.
 
-3. **Change in Method:**
-   - The keyword `modifiers:` in the `Method` rule has been changed to `validators:` in Grammar 2.
+3. **New optional/OR additions in Grammar 2**
+   - `dataStores+=DataStore` is added to the `Contract` content list, but it is part of an OR (`|`) and per your rule (2), it should **not** be instantiated.
+   - No other required additions.
 
-Now, let's reflect these changes in the instance:
+Based on that, here is **Instance 2** (updated to conform to Grammar 2), preserving formatting and only making required keyword/name changes:
 
-```plaintext
+```dsl
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -43,5 +48,3 @@ Contract SimpleContract {
 	}
 }
 ```
-
-The instance now follows Grammar 2. The `Modifier` rule-related sections have been changed to `Validator`, and the `modifiers:` keyword has been changed to `validators:` in the method. Optional additions from Grammar 2 such as `DataStore` are not instantiated, as instructed.

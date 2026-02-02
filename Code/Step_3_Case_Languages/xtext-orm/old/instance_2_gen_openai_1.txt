@@ -1,0 +1,101 @@
+To create an updated instance (Instance 2) that conforms to Grammar 2, we need to first analyze the differences between Grammar 1 and Grammar 2. Here's a summary of the key changes and their impact on Instance 1:
+
+### Key Differences between Grammar 1 and Grammar 2:
+
+1. **Configuration Block**: Grammar 2 introduces a `Configuration` block at the top-level `PersistenceModel`. It includes `JavaConfiguration` and `PythonConfiguration`, but based on the instructions, we won't instantiate them since they are optional.
+
+2. **Field and FieldDeclaration Separation**: The `Field` rule in Grammar 2 must be wrapped inside a `FieldDeclaration`, which allows for additional `TypeOptions`.
+
+3. **Entity Field Changes**:
+   - The `EntityField` now uses a cardinality symbol `|` which separates the cardinality from relationships. However, since the new attributes (bidirectional `'<->'` and unidirectional `'->'`) are in an "OR" relationship, we won't instantiate them.
+   
+4. **Backref Field Options**: BackrefField doesn't have additional options in Grammar 2, so no change here.
+
+Based on these changes, here's how you can modify Instance 1 to conform to Grammar 2:
+
+### Instance 2 (Adapted to Grammar 2):
+
+```plaintext
+Configuration [
+
+]
+
+entity Club {
+	field property name: String [unique, not_null]
+
+	field object [n..1] sportshall: SportsHall [not_null]
+
+	field object [1..n] teams: Team
+	field object [1..n] roles: ClubRole
+	field object [1..n] sessions: TrainingSession
+}
+
+entity Team {
+	field property numbering: Integer [not_null]
+	field property name: String [unique]
+
+	field object [n..1] leader: Player // UseAlter when a cyclic dependency occurs
+
+	field object [n..m] sessions: TrainingSession
+
+	field backref [Club.teams] club [not_null]
+	field backref [Player.team] members
+}
+
+entity Player {
+	field property public_id: String(100) [not_null, unique]
+	field property first_name: String [not_null]
+	field property last_name: String [not_null]
+	field property position: Integer
+
+	field object [1..n] information: Information
+	field object [1..n] roles: ClubRole
+
+	field object [n..1] team: Team
+	field object [n..1] image: Image [not_null]
+}
+
+entity Image {
+	field property path: String(200) [not_null]
+	field property title: String [not_null]
+}
+
+entity Information {
+	field property attribute: String [not_null]
+	field property val: String [not_null]
+
+	field backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	field property street: String [not_null]
+	field property street_number: Integer [not_null]
+	field property zip_code: String [not_null]
+	field property place: String [not_null]
+	field property country: String [not_null]
+	field property state: String [not_null]
+
+	field object [n..m] images: Image
+}
+
+entity ClubRole {
+	field property name: String [not_null]
+
+	field backref [Club.roles] club [not_null]
+	field backref [Player.roles] player
+}
+
+entity TrainingSession {
+	field property day: Integer [not_null]
+	field property hour: Integer [not_null]
+	field property minute: Integer [not_null]
+
+	field backref [Club.sessions] club [not_null]
+}
+```
+
+### Changes Made:
+
+- Added an empty `Configuration` block at the top, as required by Grammar 2.
+- Wrapped each `Field` in the `field` declaration in entities under the `field` keyword, as per the `FieldDeclaration` rule.
+- Retained all the existing structure and comments from Instance 1, with no additional instantiation of new optional or OR-related attributes of Grammar 2.

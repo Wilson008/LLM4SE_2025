@@ -1,11 +1,5 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I'll modify instance_1 to create instance_2. The main changes needed are:
-
-1. Change parameter map syntax from `[...]` to `{...}`
-2. Remove extra '==' in divider
-3. Update the box/end box structure according to the new SQ_Encompass rule
-
-Here's instance_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, here is instance_2 that conforms to grammar_2:
 
 ```
 @startuml
@@ -39,10 +33,11 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
-"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+... wait(10 s) Auf schönes Wetter ;)
 end box
-return response(200||201, {event: "42"})
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
 == Hier wirds kritisch
 
@@ -68,10 +63,16 @@ end
 @enduml
 ```
 
-The main changes made are:
-1. Changed `[location : "dingolfing"]` to `{location : "dingolfing"}`
-2. Changed `[event: "42"]` to `{event: "42"}`
-3. Removed the extra '==' in divider lines
-4. Restructured the box/end box section to be more compact according to the new SQ_Encompass rule
+**Changes made:**
 
-I maintained all formatting, comments, and whitespace from the original instance. No optional new features from grammar_2 were added.
+1. **Line 18**: `== Initialization ==` → `== Initialization` (removed trailing `==` per SQ_Divider rule change)
+
+2. **Line 25**: `... wait(10 s) Auf schönes Wetter ;) ...` → `... wait(10 s) Auf schönes Wetter ;)` (removed trailing `...` per SQ_Delay rule change)
+
+3. **Line 24**: `[location : "dingolfing"]` → `{location : "dingolfing"}` (changed square brackets to curly braces per PT_ParameterMap change)
+
+4. **Line 27**: `[ event: "42" ]` → `{ event: "42" }` (changed square brackets to curly braces per PT_ParameterMap change)
+
+5. **Line 31**: `== Hier wirds kritisch ==` → `== Hier wirds kritisch` (removed trailing `==`)
+
+6. **Line 35**: `== Schicksalskram ==` → `== Schicksalskram` (removed trailing `==`)

@@ -1,13 +1,7 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I'll modify instance_1 to create instance_2. Here are the necessary changes:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the modified instance that conforms to grammar_2:
 
-1. Parameter map syntax change: from `[...]` to `{...}`
-2. Box (Encompass) syntax change: from separate begin/end to a combined format
-3. No changes needed for the new color handling as both formats are still valid
-4. Other grammar changes don't require instance modifications as they're either optional or alternatives
-
-Here's instance_2:
-
+```
 @startuml
 
 ' Configuration
@@ -28,7 +22,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -39,18 +33,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
-"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+... wait(10 s) Auf schönes Wetter ;)
 end box
-return response(200||201, {event: "42"})
+return response(200||201, { event: "42" })
 
-== Hier wirds kritisch ==
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -66,9 +61,15 @@ end
 [<-- Alice : Result 
 
 @enduml
+```
 
-Main changes made:
-1. Changed `[location : "dingolfing"]` to `{location : "dingolfing"}`
-2. Changed `[event: "42"]` to `{event: "42"}`
+**Changes made:**
 
-All other formatting, including comments, whitespace, indentation, and empty lines, has been preserved exactly as in instance_1.
+1. **Line 19**: Removed closing `==` from divider (was `== Initialization ==`, now `== Initialization`)
+2. **Line 27**: Changed parameter map brackets from `[...]` to `{...}` (was `[location : "dingolfing"]`, now `{location : "dingolfing"}`)
+3. **Line 28**: Removed closing `...` from delay (was `... wait(10 s) Auf schönes Wetter ;) ...`, now `... wait(10 s) Auf schönes Wetter ;)`)
+4. **Line 31**: Changed parameter map brackets from `[...]` to `{...}` (was `[ event: "42" ]`, now `{ event: "42" }`)
+5. **Line 35**: Removed closing `==` from divider (was `== Hier wirds kritisch ==`, now `== Hier wirds kritisch`)
+6. **Line 41**: Removed closing `==` from divider (was `== Schicksalskram ==`, now `== Schicksalskram`)
+
+All other formatting, comments, whitespace, and content remain exactly as in the original instance.

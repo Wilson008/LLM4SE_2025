@@ -1,35 +1,3 @@
-Let's start by analyzing the differences between Grammar 1 and Grammar 2. Then, we'll make the necessary modifications to Instance 1 to ensure it aligns with Grammar 2.
-
-### Differences between Grammar 1 and Grammar 2:
-
-1. **IsisEntity:**
-   - Removed `events+=IsisEvent` from Grammar 1.
-   - Added `collections+=IsisCollection` to Grammar 2.
-
-2. **IsisService:**
-   - Added `collections+=IsisCollection` to Grammar 2.
-
-3. **IsisProperty:**
-   - Added `events+=IsisEvent` to Grammar 2.
-
-4. **IsisAction:**
-   - Changed structure to include `{ ... }` block with features, parameters, and events in Grammar 2.
-
-5. **IsisCollection and IsisCollectionFeature:**
-   - Added IsisCollection and corresponding features in Grammar 2.
-
-6. **IsisActionParameter:**
-   - Added feature block (`{ ... }`) in Grammar 2.
-
-7. **Enums:**
-   - Added `Complete` to `IsisPropertyFeatureType`.
-   - Added `IsisActionFeature` and `IsisCollectionFeature`.
-
-### Modifications to Instance 1 to create Instance 2:
-
-Here’s the modified Instance based on the differences analyzed:
-
-```plaintext
 package domainapp.dom.modules.simple
 
 import javax.jdo.annotations.Column
@@ -75,68 +43,35 @@ entity SimpleObject {
 	@Column(allowsNull="false", length = 40)
 	@Title(sequence="1")
 	@Property(editing = Editing.DISABLED)
-	property String name {
-		event UpdateNameDomainEvent
+	property String name
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action SimpleObject updateName {
+		parameter @Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName
+		body {
+			setName(newName)
+			this
+		}
 	}
 
-	action updateName(@Parameter(maxLength = 40)
-            @ParameterLayout(named = "New name") String newName) {
-		setName(newName)
-		this
+	action String default0UpdateName {
+		body {
+			getName()
+		}
 	}
 
-	action default0UpdateName() {
-		getName()
-	}
-
-    	action validateUpdateName(String name) {
-        	if (name.contains("!"))
-        		TranslatableString.tr("Exclamation mark is not allowed")
-        	else null
+    	action String validateUpdateName {
+		parameter String name
+		body {
+	        	if (name.contains("!"))
+	        		TranslatableString.tr("Exclamation mark is not allowed")
+	        	else null
+		}
     	}
-
-	@DomainServiceLayout(menuOrder = "10")
-	repository {
-
-    	@Action(semantics = SemanticsOf.SAFE)
-    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-		@MemberOrder(sequence = "1")
-		action listAll() {
-			container.allInstances(SimpleObject)
-		}
-
-		@Action(semantics = SemanticsOf.SAFE)
-		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-		@MemberOrder(sequence = "2")
-		action findByName(@ParameterLayout(named="Name") String name) {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
-		}
-
-		@MemberOrder(sequence = "3")
-		action create(@ParameterLayout(named="Name") String name) {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
-		}
-	}
 
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
 	}
 
 }
-```
-
-### Explanations:
-- **IsisEntity Modifications:**
-   - Removed event declaration directly inside the entity as it doesn't exist in the new version of Grammar 2 in terms of structure outside properties, collections, and actions.
-   
-- **IsisProperty:**
-   - Moved `event` inside `property { ... }`.
-
-- **IsisAction:**
-   - Structured action definitions to fit the block-styled declarations as implied in Grammar 2.
-
-Following these guidelines ensured your instance now conforms to Grammar 2 while maintaining the integrity and semantics of the original instance.

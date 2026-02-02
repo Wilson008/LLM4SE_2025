@@ -1,22 +1,44 @@
-To create instance_2 from instance_1, we'll need to take into account the differences between Grammar 1 and Grammar 2. Let's summarize the changes in the grammar:
+### Differences between Grammar 1 and Grammar 2 (relevant to Instance 1)
 
-1. **Replacements in Color Handling**: 
-   - In Grammar 1, `COLOR` terminal was replaced by `SQ_Color` which uses `HEXCOLOR` or `NAMEDCOLOR`.
-   - Elements such as `SQ_Arrow`, `SQ_Participant`, `SQ_Stereotype`, `SQ_LifelineCtrl`, and others now use `SQ_Color`.
+1. **Encompass/box handling changed**
+   - **Grammar 1:** `SQ_EncompassBegin` (`box ...`) and `SQ_EncompassEnd` (`end box`) were separate sequence elements.
+   - **Grammar 2:** They are merged into a single block element `SQ_Encompass`:
+     - `box "..." color=SQ_Color`
+     - then inner elements
+     - then `end box`
+   - Instance text stays the same syntactically, but it now parses as one construct.
 
-2. **Changes in `SQ_Encompass`**:
-   - The `SQ_EncompassBegin` and `SQ_EncompassEnd` were merged into a single `SQ_Encompass` rule.
-   
-3. **Changes in `SQ_Skinparam`**:
-   - `SQ_Skinparam` now includes a `SQ_SkinparamValue` that can be a `SQ_Color`, `INT`, `ID`, or `STRING`.
+2. **Color model changed**
+   - **Grammar 1:** single terminal `COLOR` (hex like `#aF7` or `#8877cc`).
+   - **Grammar 2:** `SQ_Color` is either:
+     - `HEXCOLOR` (same hex format), or
+     - `NAMEDCOLOR` (like `#red` etc.).
+   - Your instance only uses hex colors, so no instance change needed.
 
-4. **Changes in `PT_ParameterMap`**:
-   - The use of square brackets `[]` in the `PT_ParameterMap` has been changed to curly braces `{}`.
+3. **Divider and delay rules changed**
+   - **Grammar 1 Divider:** `'==' label '=='`
+   - **Grammar 2 Divider:** `'==' label` (no trailing `==`)
+   - **Grammar 1 Delay:** `'...' ... description ... '...'?` (optional ending `...`)
+   - **Grammar 2 Delay:** `'...' ... description` (no trailing `...`)
+   - **Impact:** Instance 1 must remove trailing `==` on divider lines, and remove trailing `...` on the delay line.
 
-5. **Description Enhancements**:
-   - Additional symbols such as `'...'`, `'=='`, and `':'` were added to `SQ_Description`.
+4. **Parameter map syntax changed (Plantestic modifications)**
+   - **Grammar 1:** `PT_ParameterMap` used square brackets: `[ a: "b" ]`
+   - **Grammar 2:** `PT_ParameterMap` uses curly braces: `{ a: "b" }`
+   - Also, `PT_Parameter` now allows optional `: value` and values can be `ID | STRING | INT` (but we won’t instantiate new optionality per your rule).
+   - **Impact:** Update all request/response parameter maps from `[...]` to `{...}` without changing spacing/formatting otherwise.
 
-Now, let's apply these changes to instance_1 to create instance_2:
+5. **Skinparam changed**
+   - **Grammar 1:** `skinparam name=ID (colorval=COLOR | numberval=INT | idval=ID | strval=STRING)`
+   - **Grammar 2:** `skinparam name=ID value=SQ_SkinparamValue` (same effect)
+   - Instance unchanged.
+
+6. **SQ_Description token set expanded**
+   - Grammar 2 adds tokens like `'...'`, `'=='`, `':'` into description. No instance change needed.
+
+---
+
+## Instance 2 (modified to follow Grammar 2)
 
 ```plantuml
 @startuml
@@ -39,7 +61,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -50,19 +72,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
+... wait(10 s) Auf schönes Wetter ;) 
 end box
 return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
-== Hier wirds kritisch ==
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -79,10 +101,3 @@ end
 
 @enduml
 ```
-
-### Key Changes Applied:
-- The `COLOR` usage has been replaced with the equivalent `SQ_Color` consideration using the defined color rules from Grammar 2 (acknowledging the change, but the instance style remains as input requires).
-- The `box ... end box` syntax was adjusted to the new `SQ_Encompass` format in Grammar 2.
-- The square brackets in parameter maps changed to curly braces.
-
-These changes bring instance_1 in line with Grammar 2 requirements, reflecting the structural differences between the two versions without deviating from the original content design and formatting constraints.

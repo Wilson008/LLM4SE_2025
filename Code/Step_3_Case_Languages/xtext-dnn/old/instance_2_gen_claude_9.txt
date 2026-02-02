@@ -1,0 +1,56 @@
+=== Step 3: Instance Transformation ===
+I'll modify instance_1 according to the differences between grammar_1 and grammar_2, following your guidelines. Here's instance_2:
+
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+
+The changes I made are:
+1. Changed hyphenated parameter names to camelCase:
+   - 'batch-size' → 'batchSize'
+   - 'image-size' → 'imageSize'
+   - 'image-channels' → 'imageChannels'
+   - 'output-labels' → 'outputLabels'
+   - 'kernel-size' → 'kernelSize'
+   - 'use-global-stats' → 'useGlobalStats'
+   - 'use-bias-term' → 'useBiasTerm'
+
+2. Removed 'caffe-path' since it's optional in grammar_2
+
+3. Changed 'output-path' → 'outputPath'
+
+4. In the branch section:
+   - Removed 'type -> residual' since BranchType is removed in grammar_2
+   - Changed 'operation' to 'eltwiseOperation'
+
+5. Changed 'final-layer' → 'finalLayer'
+
+I maintained all formatting, including white spaces, indentation, and empty lines from the original instance.

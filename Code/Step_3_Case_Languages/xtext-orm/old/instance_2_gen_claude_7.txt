@@ -1,0 +1,98 @@
+=== Step 3: Instance Transformation ===
+Looking at the differences between grammar_1 and grammar_2, the main changes required for the instance are:
+
+1. Add a mandatory 'Configuration' section at the beginning (since it's mandatory in grammar_2)
+2. In EntityField declarations, modify the cardinality syntax to include a directional indicator (either '<->' or '->')
+3. Separate the options into a new FieldDeclaration structure (though this doesn't affect the concrete syntax)
+
+Here's instance_2 conforming to grammar_2:
+
+```
+Configuration [
+	Java [
+		genpath src/main/java
+		package de.model
+		ORM Hibernate
+	]
+]
+
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1|->] sportshall: SportsHall [not_null]
+	
+	object [1..n|->] teams: Team
+	object [1..n|->] roles: ClubRole
+	object [1..n|->] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
+	
+	object [n..m|->] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n|->] information: Information
+	object [1..n|->] roles: ClubRole
+	
+	object [n..1|->] team: Team
+	object [n..1|->] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m|->] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+The main changes made were:
+1. Added a Configuration section at the start
+2. Modified all 'object' declarations to include the directional indicator '|->'
+3. Maintained all existing formatting, comments, and whitespace
+4. Used unidirectional relationships ('->') as the default choice
+5. Chose Java Configuration as an example configuration (since we need at least one)

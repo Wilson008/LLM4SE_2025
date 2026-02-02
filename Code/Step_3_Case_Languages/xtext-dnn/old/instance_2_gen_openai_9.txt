@@ -1,0 +1,65 @@
+To evolve `Instance 1` to `Instance 2` based on the differences between `Grammar 1` and `Grammar 2`, let's first identify what has changed:
+
+**Identified Changes Between Grammar 1 and Grammar 2:**
+
+1. **Stylistic Changes:**
+   - Some attributes in `Grammar 1` are snake_case, which have changed to camelCase in `Grammar 2`. These changes involve the following:
+     - `image-size` has become `imageSize`
+     - `image-channels` has become `imageChannels`
+     - `batch-size` has become `batchSize`
+     - `output-labels` has become `outputLabels`
+     - `train-data-path` has become `trainDataPath`
+     - `val-data-path` has become `valDataPath`
+     - `caffe-path` has become `caffePath`
+     - `output-path` has become `outputPath`
+     - `kernel-size` has become `kernelSize`
+     - `use-global-stats` has become `useGlobalStats`
+     - `use-bias-term` has become `useBiasTerm`
+
+2. **Structural Changes:**
+   - In the `BranchBody`, the attribute `operation ->` now becomes `eltwiseOperation ->`.
+
+**Modification of `Instance 1` to Create `Instance 2`:**
+
+We will apply these changes to `Instance 1` to create `Instance 2` as follows:
+
+```plaintext
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: final-layer  out:labels)
+}
+```
+
+**Notes on Changes:**
+
+- All the snake_case attributes have been converted to camelCase.
+- Changed `operation ->` to `eltwiseOperation ->` in the `branch` layer.
+- Maintained the same formatting (e.g., whitespaces, indentations, etc.) to ensure the structure remains recognizable.

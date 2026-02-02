@@ -1,17 +1,11 @@
 === Step 3: Instance Transformation ===
-After analyzing both grammars and the instance, I need to make the following modifications to create instance_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, I need to make the following changes to the instance:
 
-1. Due to the array declaration syntax change in ChkVariableDeclaration:
-   - Change `int[n] c (subtask 1 : 1..100)` style declarations
-   - Remove the extra space between array size and variable name
+1. **ChkVariableDeclaration**: Change `'value'` to `'sp'` (the keyword changed)
+2. **Helper - select function**: Add the mandatory range specification with `:` separator
+3. **FormatExpression**: The structure remains the same in the instance since the refactoring to `FormatVariable` is backward compatible
 
-2. Due to the 'value' to 'sp' keyword change in ChkVariableDeclaration:
-   - This doesn't affect the instance as it doesn't use this feature
-
-3. Due to the select Helper function change:
-   - Add range specification with ':' and '..' to all select functions
-
-Here's the modified instance (instance_2):
+Here's instance_2 that conforms to grammar_2:
 
 ```
 // Specification untuk soal knapsack Polo the Penguin and the Test
@@ -63,7 +57,7 @@ class Knapsack{
 	}
 	
 	MR 1 {
-		(select(k,l: 1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
 		followup {
 			(c` = swap(c,k,l))
 			(p` = swap(p,k,l))
@@ -76,7 +70,7 @@ class Knapsack{
 	}
 	
 	MR 3 {
-		(select(k: 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(t`[k] = t[k]+cc)
@@ -87,7 +81,7 @@ class Knapsack{
 	}
 	
 	MR 4 {
-		(select(k: 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(p`[k] = p[k]-cc)
@@ -123,7 +117,7 @@ class Knapsack{
 	}
 	
 	MR 7 {
-		(select(k: 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		followup {
 			(n` = n-1)
 			(c` = remove(c,k))
@@ -136,7 +130,7 @@ class Knapsack{
 	}
 	
 	MR 8 {
-		(select(k: 1..n) where y[k]==1)
+		(select(k:1..n) where y[k]==1)
 		followup {
 			(n` = n-1)
 			(c`[1] = c[1]-t[k])
@@ -150,7 +144,44 @@ class Knapsack{
 	}
 	
 	MR 9 {
-		(select(k,l: 1..n) where 1<=k and k<l and l<=n and y[k]==1 and y[l]==1)
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and y[k]==1 and y[l]==1)
 		followup {
 			(c`[k] = 1)
-			(p`[k] = c[k]*p[k]+c
+			(p`[k] = c[k]*p[k]+c[l]*p[l])
+			(t`[k] = t[k]+t[l])
+			(n` = n-1)
+			(c` = remove(c,l))
+			(p` = remove(p,l))
+			(t` = remove(t,l))
+		}
+		check {
+			
+		}
+	}
+	
+	MR 11 {
+		(select(k:1..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(p`[k] = p[k]+cc)
+		}
+		check {
+			(point` = point+cc*c[k])
+		}
+	}
+	
+	MR 12 {
+		(select(k:1..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(c`[k] = c[k]+cc)
+		}
+		check {
+			(point` = point+cc*p[k])
+		}
+	}
+}
+```
+
+**Changes made:**
+- All `select()` function calls now include the mandatory range specification with `:` separator (e.g., `select(k:1..n)` instead of `select(k)`, and `select(k,l:1..n)` instead of `select(k,l)`)

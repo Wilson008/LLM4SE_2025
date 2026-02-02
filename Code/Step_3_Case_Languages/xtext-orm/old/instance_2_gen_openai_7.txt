@@ -1,0 +1,92 @@
+To create `instance_2` following `grammar_2`, we need to analyze the changes between `grammar_1` and `grammar_2`:
+
+1. **Added Configuration Block:**
+   - In `grammar_2`, `PersistenceModel` includes a `Configuration` section. It is optional according to your guideline due to its position, so we won't include it in `instance_2`.
+
+2. **Field Options Syntax Change:**
+   - In `grammar_1`, options like `unique` and `not_null` are specified within the `PropertyField`.
+   - In `grammar_2`, options have been moved out of the specific field types into the general `FieldDeclaration` level, becoming part of `FieldDeclaration`. This means they come after the field is declared, within square brackets.
+
+3. **EntityField Syntax Modification:**
+   - In `grammar_2`, `EntityField` now includes bidirectional/unidirectional information with `'<->'` or `'->'` operators. However, these are in an "OR" relationship, so we will not instantiate them as per the instructions.
+
+Based on these differences, here is how `instance_1` should be modified to form `instance_2`:
+
+```plaintext
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1] sportshall: SportsHall [not_null]
+	
+	object [1..n] teams: Team
+	object [1..n] roles: ClubRole
+	object [1..n] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1] leader: Player
+	
+	object [n..m] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n] information: Information
+	object [1..n] roles: ClubRole
+	
+	object [n..1] team: Team
+	object [n..1] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+**Explanation:** 
+- The field options are now moved externally and apply outside specific fields wherever applicable. 
+- No other optional or new attributes are utilized (like bidirectional/unidirectional operators), following your instructions not to instantiate those optional sections.

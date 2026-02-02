@@ -1,25 +1,37 @@
-To create Instance 2, which conforms to Grammar 2, we need to analyze the differences between Grammar 1 and Grammar 2:
+### Differences between Grammar 1 and Grammar 2 (that affect the instance)
 
-1. **Attribute Naming and Variations:**
-    - Several attribute names have been changed from using hyphens (`-`) to camelCase:
-        - `batch-size` to `batchSize`
-        - `image-size` to `imageSize`
-        - `image-channels` to `imageChannels`
-        - `output-labels` to `outputLabels`
-        - `kernel-size` to `kernelSize`
-        - `caffe-path` turned optional and renamed to `caffePath`  
-      
-2. **BranchBody Changes:**
-    - The `BranchBody` no longer has a `type` field. It only contains an `eltwiseOperation`.
+**Network section keyword changes (inside single quotes):**
+- `'batch-size'` → `'batchSize'`
+- `'image-size'` → `'imageSize'`
+- `'image-channels'` → `'imageChannels'`
+- `'output-labels'` → `'outputLabels'`
+- `'caffe-path'` → `('caffePath' ...)?` (**now optional**)
+- `'output-path'` → `'outputPath'`
+- `'train-data-path'` → `'trainDataPath'` (optional in both; not used in Instance 1)
+- `'val-data-path'` → `'valDataPath'` (optional in both; not used in Instance 1)
 
-3. **Minor Renaming in Batch and Scale Normalization:**
-    - The attribute names in `BachNormBody` and `ScaleNormBody` change from:
-        - `use-global-stats` to `useGlobalStats`
-        - `use-bias-term` to `useBiasTerm`
+**Conv/Norm/Scale keyword changes:**
+- In `ConvLayerBody`: `'kernel-size'` → `'kernelSize'`
+- In `BachNormBody`: `'use-global-stats'` → `'useGlobalStats'`
+- In `ScaleNormBody`: `'use-bias-term'` → `'useBiasTerm'`
 
-Considering these changes, here's how Instance 2 should look:
+**Branch body change:**
+- Grammar 1 `BranchBody` had both:
+  - `'type' -> BranchType` and `'operation' -> OperationType`
+- Grammar 2 `BranchBody` only has:
+  - `'eltwiseOperation' -> OperationType`
+- Also, `BranchType` enum is removed in Grammar 2.
 
-```plaintext
+**LayerName literal change:**
+- `'final-layer'` → `'finalLayer'`
+
+**Important constraint you gave:** since `caffePath` is **optional** in Grammar 2 and was mandatory in Grammar 1, I must **not** instantiate it in Instance 2.
+
+---
+
+### Instance 2 (conforms to Grammar 2)
+
+```dsl
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -52,8 +64,3 @@ network "DemoNet" {
 	dense  (name: finalLayer  out:labels)
 }
 ```
-
-Please note that:
-- We have removed `caffePath` as it is now optional.
-- The `type -> residual` in the branch is removed because the `type` attribute is no longer part of the branch structure.
-- Fields such as `kernelSize`, `useGlobalStats`, `useBiasTerm`, and others follow camelCase styling based on Grammar 2 changes.

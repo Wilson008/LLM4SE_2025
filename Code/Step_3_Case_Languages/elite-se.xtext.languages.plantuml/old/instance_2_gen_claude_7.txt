@@ -1,0 +1,78 @@
+=== Step 3: Instance Transformation ===
+Based on the differences between grammar_1 and grammar_2, I'll modify instance_1 to create instance_2. The main changes needed are:
+
+1. Color syntax changes: Replace COLOR (#xxxxxx) with SQ_Color (HEXCOLOR or NAMEDCOLOR)
+2. Parameter map syntax: Change from '[...]' to '{...}'
+3. Box/Encompass structure: No change needed as the instance already follows the new structure
+4. Divider format: Remove trailing '==' in dividers
+
+Here's instance_2:
+
+```
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, {event: "42"})
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+Main changes made:
+1. Changed parameter map syntax from `[location : "dingolfing"]` to `{location : "dingolfing"}`
+2. Changed parameter map syntax from `[event: "42"]` to `{event: "42"}`
+3. Removed trailing '==' from all divider lines
+
+Everything else (including comments, whitespace, indentation, and empty lines) remains exactly the same as in instance_1.

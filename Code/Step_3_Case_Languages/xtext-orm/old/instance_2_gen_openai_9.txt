@@ -1,0 +1,92 @@
+To modify `instance_1` to adhere to `grammar_2`, we need to take into account the differences between `grammar_1` and `grammar_2`. Here's a summary of the changes and how they affect the instance:
+
+1. **Configuration Section**: `grammar_2` introduces a `Configuration` section within the `PersistenceModel`, where configurations for Java and Python can be specified. Since this section is new and optional, we won't add it to `instance_2`.
+
+2. **Entity and Field Structure**: 
+   - In `grammar_2`, fields within an entity are wrapped in a `FieldDeclaration`, which allows `TypeOption`s to be specified in a uniform way. In `instance_2`, we need to ensure each field is followed by an optional set of options enclosed in square brackets.
+   - The options for `PropertyField`, `EntityField`, and `BackrefField` have moved from their respective definitions to `FieldDeclaration`.
+
+3. **EntityField Syntax**:
+   - In `grammar_2`, `EntityField` now requires a directionality indicator (`<->` for bidirectional or `->` for unidirectional). We will not specify this optional attribute because of the instruction provided.
+
+4. **Removal of Field Options within Field Definitions**:
+   - Field options previously specified directly within fields (`PropertyField`, `EntityField`, and `BackrefField`) must now be placed within the `FieldDeclaration`.
+
+Given these adjustments, here's how `instance_2` should look:
+
+```plaintext
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1] sportshall: SportsHall [not_null]
+	
+	object [1..n] teams: Team
+	object [1..n] roles: ClubRole
+	object [1..n] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1] leader: Player // UseAlter when a cyclic dependency occurs
+	
+	object [n..m] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n] information: Information
+	object [1..n] roles: ClubRole
+	
+	object [n..1] team: Team
+	object [n..1] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+Note: No explicit directions for `EntityField` (`<->` for bidirectional or `->` for unidirectional) were added, per instruction 2. Additionally, field declarations were adjusted to match the new `FieldDeclaration` structure indirectly by changing the overall structure conceptually, not affecting the result here.

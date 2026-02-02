@@ -1,25 +1,3 @@
-To create an updated instance (Instance 2) that aligns with the changes in Grammar 2, we first need to analyze and summarize the differences between Grammar 1 and Grammar 2:
-
-1. **IsisEntity and IsisService:**
-   - Removed `events+=IsisEvent` from both `IsisEntity` and `IsisService`.
-   - Added `collections+=IsisCollection` to both `IsisEntity` and `IsisService`.
-
-2. **IsisProperty:**
-   - Added `events+=IsisEvent` structure.
-
-3. **IsisAction:**
-   - Added `features+=IsisActionFeature`.
-
-4. **New Rules:**
-   - `IsisCollection` and `IsisCollectionFeature` with corresponding enum `IsisCollectionFeatureType`.
-   - `IsisActionFeature` and `IsisActionFeatureType`.
-
-5. **Annotations Amendment:**
-   - Added required annotations in `IsisProperty`, `IsisCollection`, and `IsisActionParameter`.
-
-Following these observations, we won't instantiate any newly introduced optional or alternative features unless required. Let's now adapt Instance 1 to make Instance 2:
-
-```plaintext
 package domainapp.dom.modules.simple
 
 import javax.jdo.annotations.Column
@@ -66,57 +44,51 @@ entity SimpleObject {
 	@Title(sequence="1")
 	@Property(editing = Editing.DISABLED)
 	property String name {
-		event UpdateNameDomainEvent
-	}
-
-	@Action(domainEvent = UpdateNameDomainEvent)
-	action updateName(
-		@Parameter(maxLength = 40)
-        @ParameterLayout(named = "New name")
-        @parameter String newName
-	) {
-		setName(newName)
-		this
-	}
-
-	@action body updateName {
-		...
-	}
-
-	action default0UpdateName() {
-		getName()
-	}
-
-    	action validateUpdateName(String name) {
+		default {
+			getName()
+		}
+		modify {
+			setName(newName)
+			this
+		}
+		validate {
         	if (name.contains("!"))
         		TranslatableString.tr("Exclamation mark is not allowed")
         	else null
     	}
+	}
 
-	@DomainServiceLayout(menuOrder = "10")
 	repository {
 
     	@Action(semantics = SemanticsOf.SAFE)
     	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 		@MemberOrder(sequence = "1")
-		action listAll() {
-			container.allInstances(SimpleObject)
+		action listAll {
+			body {
+				container.allInstances(SimpleObject)
+			}
 		}
 
 		@Action(semantics = SemanticsOf.SAFE)
 		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 		@MemberOrder(sequence = "2")
-		action findByName(@ParameterLayout(named="Name") String name) {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
+		action findByName {
+			parameter @ParameterLayout(named="Name") String name
+			body {
+				container.allMatches(new QueryDefault(SimpleObject,
+					"findByName", "name", name))
+			}
 		}
 
 		@MemberOrder(sequence = "3")
-		action create(@ParameterLayout(named="Name") String name) {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
+		action create {
+			parameter @ParameterLayout(named="Name") String name
+			body {
+				val obj = container.newTransientInstance(SimpleObject)
+				obj.name = name
+				container.persistIfNotAlready(obj)
+				obj
+			}
 		}
 	}
 
@@ -125,9 +97,3 @@ entity SimpleObject {
 	}
 
 }
-```
-
-In this adaptation:
-- We respected new mandatory structuring represented in Grammar 2.
-- Ensured that syntax like `@parameter` and `action body` adjustments for compatibility with the new grammar requirements for `IsisAction` and `IsisProperty`.
-- Maintained other content not directly influenced by grammar shifts.

@@ -1,25 +1,3 @@
-To update `instance_1` from `Grammar 1` to `instance_2` to follow `Grammar 2`, let's first analyze the differences between the two grammars:
-
-### Differences between Grammar 1 and Grammar 2:
-1. **Attribute Names Changes:**
-   - `image-size` in Grammar 1 has been changed to `imageSize` in Grammar 2.
-   - `image-channels` in Grammar 1 has been changed to `imageChannels` in Grammar 2.
-   - `batch-size` in Grammar 1 has been changed to `batchSize` in Grammar 2.
-   - `output-labels` in Grammar 1 has been changed to `outputLabels` in Grammar 2.
-   - `train-data-path` in Grammar 1 has been changed to `trainDataPath` in Grammar 2.
-   - `val-data-path` in Grammar 1 has been changed to `valDataPath` in Grammar 2.
-   - `caffe-path` in Grammar 1 has become optional `caffePath` in Grammar 2 (not used in instance1).
-
-2. **Attribute Inside BranchBody:**
-   - In Grammar 1, the branch body has `type` and `operation` as distinct references.
-   - In Grammar 2, `operation` is renamed to `eltwiseOperation`, and `type` has been removed.
-
-3. **Naming Conventions in LayerName:**
-   - `final-layer` in LayerName of Grammar 1 has been changed to `finalLayer` in Grammar 2.
-
-Based on these differences, here is the updated `instance_2`:
-
-```dsl
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -27,7 +5,6 @@ network "DemoNet" {
     imageChannels = 1
     outputLabels = 10
 
-    caffePath = "$CAFFE_HOME"
     outputPath = "/media/xpitfire/data/temp"
 
 	updater -> sgd
@@ -52,11 +29,3 @@ network "DemoNet" {
 
 	dense  (name: finalLayer  out:labels)
 }
-```
-
-### Changes in instance_2:
-- Updated attribute names to camel case as per Grammar 2.
-- Removed `type` from within the `branch` body and updated `operation` to `eltwiseOperation`.
-- Changed `final-layer` to `finalLayer` in the `LayerName` section for `dense`. 
-
-No new attributes or optional rules were added in Grammar 2, aligning with the guidance to not instantiate optional or OR-type additions unless necessary.

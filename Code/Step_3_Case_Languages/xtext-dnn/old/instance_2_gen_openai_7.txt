@@ -1,0 +1,67 @@
+To generate `instance_2` from `instance_1` while conforming to `grammar_2`, we need to carefully assess the differences between `grammar_1` and `grammar_2`:
+
+### Differences between `grammar_1` and `grammar_2`:
+
+1. **Attribute Renaming**:
+   - `batch-size` is renamed to `batchSize`.
+   - `image-size` is renamed to `imageSize`.
+   - `image-channels` is renamed to `imageChannels`.
+   - `output-labels` is renamed to `outputLabels`.
+   - `train-data-path` is renamed to `trainDataPath`.
+   - `val-data-path` is renamed to `valDataPath`.
+   - `caffe-path` is renamed to `caffePath`.
+   - `output-path` is renamed to `outputPath`.
+   - `kernel-size` in `ConvLayerBody` is renamed to `kernelSize`.
+   - `use-global-stats` in `BachNormBody` is renamed to `useGlobalStats`.
+   - `use-bias-term` in `ScaleNormBody` is renamed to `useBiasTerm`.
+   - `final-layer` in `LayerName` is renamed to `finalLayer`.
+
+2. **Removal of `BranchType`**:
+   - `type -> residual` is no longer part of the branch body syntax.
+
+3. **Renaming in `BranchBody`**:
+   - `operation -> PROD` is replaced by `eltwiseOperation -> PROD`.
+
+### Conversion of `instance_1` to `instance_2` based on the differences:
+Here is how `instance_1` would be modified to create `instance_2`:
+
+```plaintext
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+```
+
+### Summary of Changes for `instance_2`:
+- Attribute names like `batch-size`, `image-size`, `image-channels`, `output-labels`, `caffe-path`, and `output-path` have been updated to their new forms.
+- Inside the `ConvLayerBody`, `kernel-size` has been changed to `kernelSize`.
+- Within the `BranchBody`, the statement `type -> residual` has been removed, and `operation -> PROD` has been renamed to `eltwiseOperation -> PROD`.
+- Lastly, names like `use-global-stats` and `use-bias-term` have been updated to `useGlobalStats` and `useBiasTerm`, respectively. Also, `final-layer` is changed to `finalLayer`.

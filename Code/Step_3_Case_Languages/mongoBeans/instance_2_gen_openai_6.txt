@@ -1,14 +1,33 @@
-To create an instance of Grammar 2 from Instance 1, let's first identify the differences between Grammar 1 and Grammar 2 and see how these affect the instance.
+### Differences between Grammar 1 and Grammar 2
 
-### Key Differences between Grammar 1 and Grammar 2:
-1. **`mongobean` Keyword Removed**: In Grammar 2, the `MongoBean` rule no longer includes the `mongobean` keyword; only the name is provided.
-2. **Inline MongoBean Types**: Grammar 2 allows for an inline definition of `MongoBean` in `MongoProperty` as `inlineType`, which could be used instead of `type`, but this is optional.
+1. **`MongoBean` rule changed**
+   - **Grammar 1:** `MongoBean` instances must start with the keyword **`'mongobean'`**:
+     ```
+     'mongobean' name=ValidID '{' ... '}'
+     ```
+   - **Grammar 2:** the **`'mongobean'`** keyword was removed; now a bean starts directly with the `name`:
+     ```
+     name=ValidID '{' ... '}'
+     ```
 
-Based on these differences, here's how Instance 1 should be transformed to create Instance 2, following the conventions and rules from Grammar 2:
+2. **`MongoProperty` rule changed**
+   - **Grammar 1:** a property must have a `type=JvmTypeReference`.
+   - **Grammar 2:** a property can have either a normal JVM type **or** an inline bean type:
+     ```
+     (type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;
+     ```
+   - Per your rule (2), since this is an **OR** addition, we **do not** instantiate the new option (`inlineType=MongoBean`). So we keep all properties using the existing `type=JvmTypeReference` form.
 
-### Instance 2 (following Grammar 2):
+3. Everything else remains the same (imports, packages, operations, formatting constructs).
 
-```plaintext
+---
+
+### Instance 2 (updated to follow Grammar 2)
+
+Only the **`mongobean`** keyword is removed everywhere it appears; all spacing, indentation, comments, and line breaks are preserved exactly otherwise.
+
+```
+// Instance 2
 import java.util.*
 
 package org.musicdb {
@@ -60,11 +79,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-### Explanation:
-- The `mongobean` keyword has been removed from the definitions of `Artist`, `Album`, `Track`, and `Duration` to comply with the changes in Grammar 2. 
-- Since no other structural changes (like adding or omitting sections of code) are dictated by Grammar 2, the rest of the content remains unchanged. 
-
-This transformation ensures that the instance complies with the new grammar rules while maintaining its intended functionality and structure.

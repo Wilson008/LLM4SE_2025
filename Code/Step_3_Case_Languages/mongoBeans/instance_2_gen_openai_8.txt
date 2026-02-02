@@ -1,20 +1,23 @@
-To modify Instance 1 to follow Grammar 2, we need to understand the differences between Grammar 1 and Grammar 2 and see how these differences impact the existing instance.
+Differences between Grammar 1 and Grammar 2 that affect instances:
 
-### Differences between Grammar 1 and Grammar 2:
+1. **MongoBean rule changed**
+   - **Grammar 1:** `MongoBean: 'mongobean' name=ValidID '{' ... '}' ;`
+   - **Grammar 2:** `MongoBean: name=ValidID '{' ... '}' ;`
+   - Impact: the literal keyword **`'mongobean'` is removed** from bean declarations.
 
-1. **MongoBean Declaration:**
-   - In Grammar 1, a `MongoBean` is declared with the keyword `mongobean` followed by its name and body.
-   - In Grammar 2, the keyword `mongobean` is removed, and only the name and body are used.
+2. **MongoProperty rule extended (optional / OR)**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
+   - Impact: properties can now use an inline bean type, but since this is an **OR** addition, per your rule (2) we **do not instantiate** the new `inlineType=MongoBean` form. So we keep the existing `type=JvmTypeReference` usages unchanged.
 
-2. **MongoProperty:**
-   - In Grammar 1, `MongoProperty` only allows a type from `JvmTypeReference`.
-   - In Grammar 2, `MongoProperty` can use either a `JvmTypeReference` for type or an inline `MongoBean` (but this change is not mandatory to use in the instance if it's in "OR" relation).
+3. Everything else is unchanged for this instance (imports, packages, operations).
 
-With these changes in mind, let's modify Instance 1 to create Instance 2 that follows Grammar 2.
+So the only required textual change to make Instance 1 conform to Grammar 2 is: **remove `mongobean` before each bean name**, keeping formatting exactly.
 
-### Instance 2:
+### Instance 2 (conforms to Grammar 2)
 
-```plaintext
+```
+// NOTE: unchanged import and package structure
 import java.util.*
 
 package org.musicdb {
@@ -66,12 +69,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-### Key Modifications:
-
-- Removed `mongobean` keyword from each `MongoBean` declaration. The structure of the Instance was maintained, including comments and formatting.
-- Other parts of the structure (properties and methods) remain unchanged since they conform to both versions of the grammar. 
-
-This ensures that Instance 2 adheres to Grammar 2's rules while maintaining the original structure and intention of Instance 1.

@@ -1,0 +1,53 @@
+To create an instance that adheres to the updated Grammar 2, we need to analyze the differences between the two grammars and apply those changes to Instance 1:
+
+### Differences Between Grammar 1 and Grammar 2:
+
+1. **Modifier is Renamed to Validator**:
+   - In Grammar 2, what was previously called `Modifier` is now called `Validator`.
+   
+2. **Method Keywords**:
+   - `modifiers:` in Grammar 1 has been renamed to `validators:` in Grammar 2 within the `Method` rule.
+
+3. **New Rule `DataStore`**:
+   - Grammar 2 introduces a new rule called `DataStore`. Since the instruction specifies not to instantiate new optional elements, we'll ignore this for Instance 2.
+
+### Applying Changes to Instance 1:
+- Convert all instances of `Modifier` to `Validator`.
+- Change the `modifiers:` keyword within the `method` to `validators:`.
+
+Given these changes, here's how Instance 1 should be updated to become Instance 2:
+
+```
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+This adapted instance, Instance 2, is now in compliance with Grammar 2.

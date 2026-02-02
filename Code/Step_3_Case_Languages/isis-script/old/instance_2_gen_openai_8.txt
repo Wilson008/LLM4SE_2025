@@ -1,0 +1,158 @@
+To create `instance_2` following `grammar_2`, let's first identify the key differences between `grammar_1` and `grammar_2`.
+
+### Differences Between Grammar 1 and Grammar 2
+1. **Changes in `IsisEntity` and `IsisService`:**
+   - `IsisEntity`: 
+     - Removed `events` and `repositories`. 
+     - Added `collections`.
+   - `IsisService`:
+     - Added `collections`.
+
+2. **IsisProperty:**
+   - Added `events` inside `IsisProperty`.
+
+3. **New Introductions:**
+   - **IsisCollection:** This new construct includes features similar to `IsisPropertyFeature` and allows `events`.
+   - **Feature Annotations:** Added annotations for `IsisPropertyFeature`, `IsisCollectionFeature`, `IsisActionParameterFeature`.
+
+4. **IsisAction:**
+   - **Instead of parameters followed by expression, it now has `features`, `parameters`, and `events`.**
+
+5. **Parameter Annotations:**
+   - Parameters in `IsisAction` now have a required `@parameter` annotation.
+
+### Modifying Instance 1 to Create Instance 2
+- We will adjust based on the changes in `grammar_2`, particularly the structure changes in `IsisEntity`, `IsisAction`, and the introduction of `IsisCollection`. 
+- Add the required annotations for parameters in actions.
+
+```dsl
+package domainapp.dom.modules.simple
+
+import javax.jdo.annotations.Column
+import javax.jdo.annotations.DatastoreIdentity
+import javax.jdo.annotations.IdGeneratorStrategy
+import javax.jdo.annotations.IdentityType
+import javax.jdo.annotations.PersistenceCapable
+import javax.jdo.annotations.Queries
+import javax.jdo.annotations.Query
+import javax.jdo.annotations.Unique
+import javax.jdo.annotations.Version
+import javax.jdo.annotations.VersionStrategy
+import org.apache.isis.applib.annotation.Action
+import org.apache.isis.applib.annotation.ActionLayout
+import org.apache.isis.applib.annotation.BookmarkPolicy
+import org.apache.isis.applib.annotation.DomainObject
+import org.apache.isis.applib.annotation.DomainObjectLayout
+import org.apache.isis.applib.annotation.DomainServiceLayout
+import org.apache.isis.applib.annotation.Editing
+import org.apache.isis.applib.annotation.MemberOrder
+import org.apache.isis.applib.annotation.Parameter
+import org.apache.isis.applib.annotation.ParameterLayout
+import org.apache.isis.applib.annotation.Property
+import org.apache.isis.applib.annotation.SemanticsOf
+import org.apache.isis.applib.annotation.Title
+import org.apache.isis.applib.query.QueryDefault
+import org.apache.isis.applib.services.i18n.TranslatableString
+
+@PersistenceCapable(identityType=IdentityType.DATASTORE)
+@DatastoreIdentity(strategy=IdGeneratorStrategy.IDENTITY, column="id")
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="version")
+@Queries(#[
+	@Query(name = "find", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject"),
+	@Query(name = "findByName", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject WHERE name.indexOf(:name) >= 0")
+])
+@Unique(name="SimpleObject_name_UNQ", members = #["name"])
+@DomainObject(objectType = "SIMPLE")
+@DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+entity SimpleObject {
+
+	@Column(allowsNull="false", length = 40)
+	@Title(sequence="1")
+	@Property(editing = Editing.DISABLED)
+	property String name {
+      // property features and events can be added here.
+  }
+
+	event UpdateNameDomainEvent
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action updateName {
+        // action features can be added here.
+
+		@parameter
+		@Parameter(maxLength = 40)
+        @ParameterLayout(named = "New name") String newName {
+			setName(newName)
+			this
+		}
+	}
+
+	action default0UpdateName {
+        // action features can be added here.
+        
+		getName()
+	}
+
+	action validateUpdateName {
+        // action features can be added here.
+
+		@parameter
+		String name {
+        	if (name.contains("!"))
+        		TranslatableString.tr("Exclamation mark is not allowed")
+        	else null
+        }
+	}
+
+	@DomainServiceLayout(menuOrder = "10")
+	repository {
+
+    	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "1")
+		action listAll {
+            // action features can be added here.
+
+			container.allInstances(SimpleObject)
+		}
+
+		@Action(semantics = SemanticsOf.SAFE)
+		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "2")
+		action findByName {
+            // action features can be added here.
+
+			@parameter
+			@ParameterLayout(named="Name") String name {
+				container.allMatches(new QueryDefault(SimpleObject,
+					"findByName", "name", name))
+			}
+		}
+
+		@MemberOrder(sequence = "3")
+		action create {
+            // action features can be added here.
+
+			@parameter
+			@ParameterLayout(named="Name") String name {
+				val obj = container.newTransientInstance(SimpleObject)
+				obj.name = name
+				container.persistIfNotAlready(obj)
+				obj
+			}
+		}
+	}
+
+	title {
+		TranslatableString.tr("Object: {name}", "name", name)
+	}
+
+}
+```
+
+### Explanation
+1. Adjusted the `IsisAction` to include `@parameter` before the parameters, as required by `grammar_2`.
+2. Kept placeholders for new features like property features, action features, and collections, aligning with `grammar_2`.
+3. Ensured to maintain the syntax, newlines, and general formatting present in `instance_1`.

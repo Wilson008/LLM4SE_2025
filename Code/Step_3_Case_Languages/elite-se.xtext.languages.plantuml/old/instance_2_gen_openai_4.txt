@@ -1,0 +1,93 @@
+To generate Instance 2, we need to analyze the differences between Grammar 1 and Grammar 2, and then apply necessary changes to Instance 1 to ensure it conforms to Grammar 2.
+
+### Key Differences in the Grammars:
+1. **Color Handling**: 
+   - Grammar 1 has a terminal `COLOR` defined as hex colors only.
+   - Grammar 2 separates `SQ_Color` to include newly defined `HEXCOLOR` and `NAMEDCOLOR`. `HEXCOLOR` is similar to `COLOR`, while `NAMEDCOLOR` allows named colors after a `#`.
+   
+2. **Encompass Operations:**
+   - In Grammar 1, separate rules for `SQ_EncompassBegin` and `SQ_EncompassEnd` exist.
+   - In Grammar 2, these are combined under `SQ_Encompass`, which is a start-end encapsulation block.
+
+3. **Refactored `PT_ParameterMap`:**
+   - The syntax in Grammar 1 used square brackets `[]`.
+   - Grammar 2 now uses curly brackets `{}`.
+
+4. **`SQ_Skinparam` adjustment:**
+   - In Grammar 1, `skinparam` accepted various values such as color directly; Grammar 2 includes a custom data type `SQ_SkinparamValue`.
+
+5. **Introduction of `SQ_Color`:**
+   - Refactor sections where `COLOR` was used, to use `SQ_Color` encapsulating both hex and named colors.
+
+**Implementing Changes in Instance 1:**
+
+Here is how Instance 1 can be updated to fit Grammar 2:
+
+```plantuml
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+### Changes Made:
+- **Curly Braces for Parameters**: Adjusted from `[]` to `{}` in the `request` and `response` messages.
+- **Color Handling**: Verified use of `#` symbols for any colors, maintaining usage to match optional `NAMEDCOLOR`.
+- **Box End**: Merged box and end-box using Grammar 2's syntax into the structure without a separate keyword for ending it.
+
+Other optional changes (like new attributes not in use) were not instantiated as per instructions. Format, comments, and unmentioned syntax/UML elements were retained as is.

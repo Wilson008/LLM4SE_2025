@@ -1,16 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 to conform to grammar_2 while following your guidelines.
-
-Key changes needed:
-1. The 'action' syntax has changed significantly:
-   - In grammar_2, actions require a block structure with '{''}' and features
-   - Actions now use 'type' instead of 'returnType'
-
-2. The 'events' are now nested within properties and collections in grammar_2
-
-3. 'repository' rule has been removed from grammar_2
-
-Here's the modified instance (instance_2) conforming to grammar_2:
+Looking at the differences between grammar_1 and grammar_2, and analyzing instance_1, here's instance_2 that conforms to grammar_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -63,8 +52,10 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action SimpleObject updateName {
-		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+	action String updateName {
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
@@ -77,14 +68,14 @@ entity SimpleObject {
 		}
 	}
 
-    	action TranslatableString validateUpdateName {
+    	action String validateUpdateName {
 		parameter String name
-		body {
-        		if (name.contains("!"))
+        	body {
+			if (name.contains("!"))
         			TranslatableString.tr("Exclamation mark is not allowed")
         		else null
-    		}
-	}
+		}
+    	}
 
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
@@ -93,11 +84,15 @@ entity SimpleObject {
 }
 ```
 
-Main changes made:
-1. Moved 'UpdateNameDomainEvent' event inside the 'name' property block
-2. Restructured actions to use the new block syntax with 'body' feature
-3. Added parameter declarations using the new 'parameter' keyword
-4. Removed the repository section as it's no longer supported in grammar_2
-5. Maintained all original formatting, whitespace, and indentation
+**Key changes made:**
 
-I didn't add any optional new features from grammar_2 (like collections or additional features) as per your guidelines.
+1. **Property `name`**: Moved the `event UpdateNameDomainEvent` inside the property block (as per grammar_2, events can now be inside properties)
+
+2. **Actions structure**: Changed from grammar_1's `action ReturnType name(params) { expression }` to grammar_2's `action ReturnType name { parameters/features }`:
+   - Added return type `String` (now mandatory in grammar_2)
+   - Moved parameters inside the action body using `parameter` keyword
+   - Wrapped the original expression in a `body { }` block (IsisActionFeature)
+
+3. **Removed repository**: Grammar_2 removed `repositories` from IsisEntity, so the entire repository block was deleted
+
+Note: Collections were not added as they are a new optional feature in grammar_2 (rule 2).

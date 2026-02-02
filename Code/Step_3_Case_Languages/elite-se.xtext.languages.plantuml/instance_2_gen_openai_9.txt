@@ -1,27 +1,49 @@
-Let's first analyze the differences between Grammar 1 and Grammar 2.
+### Key differences (Grammar 1 → Grammar 2) that affect `instance_1`
 
-### Key Differences:
-1. **Color Handling**:
-   - **Grammar 1**: Used a terminal `COLOR` for hexadecimal colors.
-   - **Grammar 2**: Introduces `SQ_Color`, which supports both `HEXCOLOR` and `NAMEDCOLOR`. 
+1. **`box ... end box` changed**
+   - **Grammar 1**:  
+     `SQ_EncompassBegin: 'box' title=STRING color=COLOR;`  
+     `SQ_EncompassEnd: 'end' 'box';`
+   - **Grammar 2**:  
+     `SQ_Encompass: 'box' title=STRING color=SQ_Color ( ... ) NEWLINE 'end' 'box';`
+   - Impact: your existing `box ... end box` block already matches Grammar 2’s combined rule (no change needed).
 
-2. **SQ_Encompass**:
-   - **Grammar 1**: Used `SQ_EncompassBegin` and `SQ_EncompassEnd`.
-   - **Grammar 2**: These are merged into `SQ_Encompass`.
+2. **Colors: `COLOR` replaced by `SQ_Color` = `HEXCOLOR | NAMEDCOLOR`**
+   - Grammar 1 had `COLOR` like `#eba`, `#aF7`, `#8877cc`.
+   - Grammar 2 splits into:
+     - `HEXCOLOR`: same as before (`#rgb` or `#rrggbb`)
+     - `NAMEDCOLOR`: now **must** be `#` + letters only (e.g., `#red`, `#Blue`)
+   - Impact: all your colors are hex-form and remain valid. No changes needed.
 
-3. **SQ_Skinparam**:
-   - **Grammar 1**: `SQ_Skinparam` allowed `colorval=COLOR`, `numberval=INT`, `idval=ID`, and `strval=STRING`.
-   - **Grammar 2**: Changed to use `SQ_SkinparamValue`, which supports `SQ_Color`, `INT`, `ID`, and `STRING`.
+3. **Divider syntax changed**
+   - **Grammar 1**: `SQ_Divider: '==' label=... '==';`
+   - **Grammar 2**: `SQ_Divider: '==' label=...;` (no trailing `==`)
+   - Impact: lines like `== Initialization ==` must become `== Initialization` (and similarly for the other dividers).
 
-4. **PT_ParameterMap**:
-   - **Grammar 1**: Used square brackets `[...]`.
-   - **Grammar 2**: Changed to curly braces `{...}` for parameter maps.
+4. **Delay syntax changed**
+   - **Grammar 1**: `SQ_Delay: '...' (wait=...)? description=... '...'?;` (optional closing `...`)
+   - **Grammar 2**: `SQ_Delay: '...' (wait=...)? description=...;` (**no** closing `...`)
+   - Impact: your delay line `... wait(10 s) Auf schönes Wetter ;) ...` must lose the trailing `...`.
 
-5. **Use of SQ_Color** in various rules (Participant, LifelineCtrl, etc.) now requires updating color formats to be consistent with `SQ_Color`.
+5. **Parameter map syntax changed**
+   - **Grammar 1**: `PT_ParameterMap: '[' ... ']'`
+   - **Grammar 2**: `PT_ParameterMap: '{' ... '}'`
+   - Impact: all `request(...)` / `response(...)` payload parameter maps must change from `[...]` to `{...}`.
+   - Additionally, Grammar 2 allows `name=ID (':' value=PT_ParameterValue)?` (optional `:` and value), but per your rule (2) we do not add new optional parts; we only adjust existing ones.
 
-Given these changes, let's evolve Instance 1 to conform to Grammar 2, keeping in mind the instructions provided:
+6. **`skinparam` changed shape, but your instance still fits**
+   - Grammar 1: `skinparam name=ID (colorval=COLOR | numberval=INT | idval=ID | strval=STRING)`
+   - Grammar 2: `skinparam name=ID value=SQ_SkinparamValue`
+   - Your `skinparam roundcorner 25` still matches (value = INT). No change.
 
-```plaintext
+7. **`SQ_Description` token set expanded**
+   - This only improves parsing robustness; no instance edits required.
+
+---
+
+## instance_2 (modified to follow Grammar 2)
+
+```plantuml
 @startuml
 
 ' Configuration
@@ -42,7 +64,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -53,19 +75,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
+... wait(10 s) Auf schönes Wetter ;) 
 end box
 return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
-== Hier wirds kritisch ==
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -82,10 +104,3 @@ end
 
 @enduml
 ```
-
-### Modifications Made:
-1. SQ_Color: Hexadecimal and named colors were adjusted to match the SQ_Color rule while maintaining their structure as '#colorCode' or '#colorName'.
-2. SQ_Encompass: The `box ... end box` was updated from previous `SQ_EncompassBegin`/`SQ_EncompassEnd` to the new consolidated `SQ_Encompass`.
-3. PT_ParameterMap: Square brackets `[` and `]` for parameter maps have been converted to curly braces `{` and `}` accordingly.
-
-This new instance, Instance 2, should now be conformant with Grammar 2.

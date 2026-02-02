@@ -1,12 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 to conform to grammar_2. The key changes needed are:
-
-1. `Modifier` keyword changed to `validator`
-2. `modifiers:` keyword changed to `validators:`
-
-The new `DataStore` rule is optional (it's in an OR relationship in the Contract rule), so following guideline #2, I won't add any DataStore instances.
-
-Here's instance_2 that conforms to grammar_2:
+Based on the analysis of the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
 ```
 Contract SimpleContract {
@@ -41,8 +34,9 @@ Contract SimpleContract {
 }
 ```
 
-The changes made were:
-1. Changed `Modifier` to `validator` for the two validator definitions
-2. Changed `modifiers:` to `validators:` in the method definition
+**Changes made:**
+1. `Modifier` keyword changed to `validator` (lines 6 and 11)
+2. `modifiers:` keyword changed to `validators:` in the method (line 16)
 
-All other formatting, including whitespace, indentation, and empty lines, remains exactly the same as in instance_1.
+**Not added:**
+- The new `DataStore` element was not instantiated because it's optional (in an OR relationship with other elements in the Contract rule)

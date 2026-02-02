@@ -1,11 +1,7 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I need to modify instance_1 to make it conform to grammar_2. The main changes required are:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the migrated instance_2 that conforms to grammar_2:
 
-1. Parameter map syntax change from '[' ']' to '{' '}'
-2. Box/Encompass structure change (combining begin and end into a single rule)
-
-Here's the modified instance (instance_2):
-
+```
 @startuml
 
 ' Configuration
@@ -26,7 +22,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -37,20 +33,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
-"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+... wait(10 s) Auf schönes Wetter ;)
 end box
-return response(200||201, {event: "42"})
+return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
-== Hier wirds kritisch ==
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -66,10 +61,20 @@ end
 [<-- Alice : Result 
 
 @enduml
+```
 
-The main changes made:
-1. Changed [location : "dingolfing"] to {location : "dingolfing"}
-2. Changed [event: "42"] to {event: "42"}
-3. Restructured the box section to follow the new combined encompass rule format
+**Key changes made:**
 
-I maintained all formatting, comments, and whitespace as in the original instance. I didn't add any optional new features from grammar_2, following the given requirements.
+1. **SQ_Divider**: Removed trailing `==` from all divider lines (lines with `== ... ==` became `== ...`)
+   - `== Initialization ==` → `== Initialization`
+   - `== Hier wirds kritisch ==` → `== Hier wirds kritisch`
+   - `== Schicksalskram ==` → `== Schicksalskram`
+
+2. **SQ_Delay**: Removed trailing `...` from delay line
+   - `... wait(10 s) Auf schönes Wetter ;) ...` → `... wait(10 s) Auf schönes Wetter ;)`
+
+3. **PT_ParameterMap**: Changed brackets from `[...]` to `{...}` in request/response parameter maps
+   - `[location : "dingolfing"]` → `{location : "dingolfing"}`
+   - `[ event: "42" ]` → `{ event: "42" }`
+
+All other elements remain unchanged, including comments, whitespace, indentation, and empty lines.

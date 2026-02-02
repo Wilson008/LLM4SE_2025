@@ -1,0 +1,77 @@
+To modify Instance 1 to follow Grammar 2, we need to understand the differences between Grammar 1 and Grammar 2 and see how these differences impact the existing instance.
+
+### Differences between Grammar 1 and Grammar 2:
+
+1. **MongoBean Declaration:**
+   - In Grammar 1, a `MongoBean` is declared with the keyword `mongobean` followed by its name and body.
+   - In Grammar 2, the keyword `mongobean` is removed, and only the name and body are used.
+
+2. **MongoProperty:**
+   - In Grammar 1, `MongoProperty` only allows a type from `JvmTypeReference`.
+   - In Grammar 2, `MongoProperty` can use either a `JvmTypeReference` for type or an inline `MongoBean` (but this change is not mandatory to use in the instance if it's in "OR" relation).
+
+With these changes in mind, let's modify Instance 1 to create Instance 2 that follows Grammar 2.
+
+### Instance 2:
+
+```plaintext
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+### Key Modifications:
+
+- Removed `mongobean` keyword from each `MongoBean` declaration. The structure of the Instance was maintained, including comments and formatting.
+- Other parts of the structure (properties and methods) remain unchanged since they conform to both versions of the grammar. 
+
+This ensures that Instance 2 adheres to Grammar 2's rules while maintaining the original structure and intention of Instance 1.

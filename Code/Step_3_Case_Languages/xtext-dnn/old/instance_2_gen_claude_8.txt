@@ -1,0 +1,49 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences and create instance_2 based on the evolution rules from grammar_1 to grammar_2. Here are the main changes needed:
+
+1. Change hyphenated parameter names to camelCase
+2. Remove 'type -> residual' in branch since BranchType is removed in grammar_2
+3. Change 'operation' to 'eltwiseOperation' in branch
+4. Change 'use-bias-term' to 'useBiasTerm'
+5. Change 'use-global-stats' to 'useGlobalStats'
+6. Change 'kernel-size' to 'kernelSize'
+7. Change 'final-layer' to 'finalLayer'
+
+Here's instance_2:
+
+```
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+```
+
+I've maintained all formatting, including spaces, tabs, and empty lines, while only changing the necessary elements to conform to grammar_2.

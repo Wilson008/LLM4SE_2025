@@ -1,14 +1,22 @@
-Let's first analyze the differences between Grammar 1 and Grammar 2:
+Differences between **Grammar 1** and **Grammar 2** (that affect the concrete syntax):
 
-1. **Removal of `mongobean` Keyword:**
-   - In Grammar 1, the `MongoBean` rule starts with the keyword "mongobean". In Grammar 2, the keyword has been removed from the `MongoBean` rule definition.
+1. **`MongoBean` header changed**
+   - **Grammar 1:** `MongoBean: 'mongobean' name=ValidID '{' ... '}' ;`
+   - **Grammar 2:** `MongoBean: name=ValidID '{' ... '}' ;`
+   - Impact: the keyword **`'mongobean'` is removed** from bean declarations. So every occurrence of `mongobean X {` must become `X {`.
 
-2. **Inline Type Definition:**
-   - In Grammar 2, the `MongoProperty` rule allows for an inline type definition using `inlineType=MongoBean`. This is an optional feature added in Grammar 2, so we don’t need to instantiate it in the instance. 
+2. **`MongoProperty` type was extended (optional/OR)**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
+   - Impact: properties can now use an inline bean type as an alternative, but since this is an **OR extension**, per your rule (2) we **do not instantiate** the new alternative. Existing properties using `JvmTypeReference` remain unchanged.
 
-Now, let's apply these differences to Instance 1 to create Instance 2:
+3. Everything else relevant to Instance 1 stays the same (imports, package declaration, operations syntax, `*`, parentheses/braces, comments/formatting).
 
-```java
+---
+
+### Instance 2 (updated to conform to Grammar 2)
+
+```text
 import java.util.*
 
 package org.musicdb {
@@ -60,7 +68,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-In Instance 2, the `mongobean` keyword is removed while preserving all white spaces, formats, and comments as in Instance 1. The change aligns with the modifications in Grammar 2.

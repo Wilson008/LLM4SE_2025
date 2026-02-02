@@ -1,20 +1,28 @@
-To create an instance that follows Grammar 2 based on Instance 1, let's analyze the differences between Grammar 1 and Grammar 2:
+Differences between Grammar 1 and Grammar 2 (that affect instances)
 
-1. **Grammar Rule Changes:**
-   - `Modifier` in Grammar 1 has been renamed to `Validator` in Grammar 2.
-   - A new feature called `dataStores` with the `DataStore` rule has been added in Grammar 2.
-   - In Grammar 2's `Method` rule, `modifiers` have been replaced with `validators`.
+1. **`Modifier` rule renamed to `Validator`**
+   - Grammar 1: `Modifier: 'Modifier' name=ID ...`
+   - Grammar 2: `Validator: 'validator' name=ID ...`
+   - This changes both the keyword (`'Modifier'` → `'validator'`) and the referenced type name in methods.
 
-2. **Instance Differences:**
-   - We need to change occurrences of `Modifier` in Instance 1 to `Validator` to match the new rule name.
-   - In the `Method` section, replace `modifiers:` with `validators:`.
+2. **In `Contract`, the repeated elements changed**
+   - Grammar 1 allowed: `attributes | events | methods | modifiers`
+   - Grammar 2 allows: `attributes | events | methods | validators | dataStores`
+   - `dataStores` is new and optional (in an `|`), so per your rule (2) it should **not** be instantiated.
 
-3. **Optional Features:**
-   - We will not include the `DataStore` elements since they are optional and were not present in the original instance.
+3. **In `Method`, the keyword for linking to modifiers changed**
+   - Grammar 1: `modifiersKeyword='modifiers:' modifiers+=[Modifier] ...`
+   - Grammar 2: `modifiersKeyword='validators:' validators+=[Validator] ...`
+   - So inside method bodies: `modifiers:` must become `validators:` and the referenced names must refer to `validator` declarations.
 
-Based on these considerations, here's the modified Instance 2 following Grammar 2:
+4. **Everything else used by Instance 1 remains compatible**
+   - `Contract`, `Attribute`, `Event`, `Param`, `Output`, and `DataType` are unchanged in the parts exercised by Instance 1.
+   - `DataStore` is new but optional, so we do not add it.
 
-```plaintext
+---
+
+## Instance 2 (updated to conform to Grammar 2)
+
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -45,6 +53,3 @@ Contract SimpleContract {
 		description: "Este evento es para notificar cuando el name se ha actualizado"
 	}
 }
-```
-
-This version of the instance reflects the changes between Grammar 1 and Grammar 2, primarily focusing on the renaming of `Modifier` to `Validator` and the associated rule updates in the `Method` section.

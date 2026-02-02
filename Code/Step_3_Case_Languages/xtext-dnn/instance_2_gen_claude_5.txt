@@ -1,6 +1,7 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I'll modify instance_1 to create instance_2 that conforms to grammar_2. The main changes will be converting kebab-case to camelCase and adjusting the branch-related syntax. Here's instance_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance_2 that conforms to the second grammar:
 
+```
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -8,7 +9,6 @@ network "DemoNet" {
     imageChannels = 1
     outputLabels = 10
 
-    caffePath = "$CAFFE_HOME"
     outputPath = "/media/xpitfire/data/temp"
 
 	updater -> sgd
@@ -33,24 +33,20 @@ network "DemoNet" {
 
 	dense  (name: finalLayer  out:labels)
 }
+```
 
-The changes made are:
-1. Renamed kebab-case attributes to camelCase:
-   - 'batch-size' → 'batchSize'
-   - 'image-size' → 'imageSize'
-   - 'image-channels' → 'imageChannels'
-   - 'output-labels' → 'outputLabels'
-   - 'caffe-path' → 'caffePath'
-   - 'output-path' → 'outputPath'
-   - 'kernel-size' → 'kernelSize'
-   - 'use-global-stats' → 'useGlobalStats'
-   - 'use-bias-term' → 'useBiasTerm'
+**Changes made:**
+1. `batch-size` → `batchSize`
+2. `image-size` → `imageSize`
+3. `image-channels` → `imageChannels`
+4. `output-labels` → `outputLabels`
+5. Removed `caffe-path = "$CAFFE_HOME"` (now optional in grammar_2, so not instantiated per rule 2)
+6. `output-path` → `outputPath`
+7. `kernel-size` → `kernelSize` (in all conv layers)
+8. `operation` → `eltwiseOperation` (in branch body)
+9. Removed `type -> residual` line (BranchType removed from grammar_2)
+10. `use-global-stats` → `useGlobalStats`
+11. `use-bias-term` → `useBiasTerm`
+12. `final-layer` → `finalLayer`
 
-2. Modified branch section:
-   - Removed 'type -> residual' as it's no longer in grammar_2
-   - Renamed 'operation' to 'eltwiseOperation'
-
-3. Changed layer naming:
-   - 'final-layer' → 'finalLayer'
-
-All formatting, including whitespace, indentation, and empty lines, has been preserved exactly as in instance_1.
+All formatting, whitespace, indentation, tabs, and empty lines have been preserved exactly as in the original instance.

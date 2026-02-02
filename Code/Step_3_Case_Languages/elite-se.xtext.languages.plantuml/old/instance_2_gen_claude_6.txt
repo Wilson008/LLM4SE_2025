@@ -1,0 +1,88 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between the grammars and modify instance_1 to create instance_2 that conforms to grammar_2. The main changes needed are:
+
+1. Color syntax changes:
+   - From COLOR to HEXCOLOR/NAMEDCOLOR through SQ_Color rule
+   - Need to modify color values like #eeaaaa, #aF7, #8877cc, #0000aa, #ffaaaa, #eba
+
+2. Parameter Map syntax:
+   - Change from '[...]' to '{...}'
+
+3. Box/Encompass structure:
+   - Change from separate 'box' and 'end box' to a nested structure
+   - No structural change needed as the instance already uses this pattern
+
+Here's instance_2 with the necessary modifications:
+
+```
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+The main changes made were:
+1. Changed parameter map syntax from '[...]' to '{...}' in:
+   - request(..., [location : "dingolfing"]) → request(..., {location : "dingolfing"})
+   - response(..., [ event: "42" ]) → response(..., { event: "42" })
+
+2. Kept all colors as they were since both HEXCOLOR and NAMEDCOLOR are valid in grammar_2
+
+3. Maintained all formatting, comments, and whitespace exactly as in the original instance.
+
+All other elements were kept unchanged as they conform to both grammars.

@@ -1,18 +1,5 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I need to make the following modifications to instance_1 to create instance_2:
-
-1. Change the ChkVariableDeclaration syntax:
-   - From: `(arr+='[' (sz+=CHK_NUMBER)? ']')*`
-   - To: `('[' sz+=CHK_NUMBER ']')*`
-   This means removing empty array size declarations.
-
-2. Change the 'value' keyword to 'sp' in variable declarations.
-
-3. For the select helper function, need to add ':' and range.
-   - From: `select='select' '(' vars+=ValidID (',' vars+=ValidID)* ')'`
-   - To: `select='select' '(' vars+=ValidID (',' vars+=ValidID)* ':' ((var3=ChkVariables) '..' (var4=ChkVariables)) ')'`
-
-Here's the modified instance (instance_2):
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the modified instance that conforms to grammar_2:
 
 ```
 // Specification untuk soal knapsack Polo the Penguin and the Test
@@ -64,7 +51,7 @@ class Knapsack{
 	}
 	
 	MR 1 {
-		(select(k,l : 1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
 		followup {
 			(c` = swap(c,k,l))
 			(p` = swap(p,k,l))
@@ -77,7 +64,7 @@ class Knapsack{
 	}
 	
 	MR 3 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(t`[k] = t[k]+cc)
@@ -88,7 +75,7 @@ class Knapsack{
 	}
 	
 	MR 4 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(p`[k] = p[k]-cc)
@@ -124,7 +111,7 @@ class Knapsack{
 	}
 	
 	MR 7 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:1..n) where y[k]==0)
 		followup {
 			(n` = n-1)
 			(c` = remove(c,k))
@@ -137,7 +124,7 @@ class Knapsack{
 	}
 	
 	MR 8 {
-		(select(k : 1..n) where y[k]==1)
+		(select(k:1..n) where y[k]==1)
 		followup {
 			(n` = n-1)
 			(c`[1] = c[1]-t[k])
@@ -151,4 +138,52 @@ class Knapsack{
 	}
 	
 	MR 9 {
-		(select(k,l : 1..
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and y[k]==1 and y[l]==1)
+		followup {
+			(c`[k] = 1)
+			(p`[k] = c[k]*p[k]+c[l]*p[l])
+			(t`[k] = t[k]+t[l])
+			(n` = n-1)
+			(c` = remove(c,l))
+			(p` = remove(p,l))
+			(t` = remove(t,l))
+		}
+		check {
+			
+		}
+	}
+	
+	MR 11 {
+		(select(k:1..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(p`[k] = p[k]+cc)
+		}
+		check {
+			(point` = point+cc*c[k])
+		}
+	}
+	
+	MR 12 {
+		(select(k:1..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(c`[k] = c[k]+cc)
+		}
+		check {
+			(point` = point+cc*p[k])
+		}
+	}
+}
+```
+
+**Key changes made:**
+
+1. **Select function calls**: Added the mandatory range specification using `:` and `..` syntax as required by grammar_2's Helper rule for the `select` function. For example:
+   - `select(k,l)` → `select(k,l:1..n)`
+   - `select(k)` → `select(k:1..n)`
+
+All other parts of the instance remain unchanged because:
+- The array declaration syntax `int[n]` already had the size specified, so no changes were needed
+- The `value` to `sp` keyword change doesn't apply as there are no `value` keywords in the original instance
+- FormatExpression changes don't affect this instance as the format expressions don't use array indexing syntax on variables

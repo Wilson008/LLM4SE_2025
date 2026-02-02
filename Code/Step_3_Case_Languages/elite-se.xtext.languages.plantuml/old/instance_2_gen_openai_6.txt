@@ -1,0 +1,88 @@
+To evolve `Instance 1` to conform to `Grammar 2`, we must first identify the changes between `Grammar 1` and `Grammar 2`. Here are the key differences:
+
+1. **Color Handling**:
+   - The terminal `COLOR` is replaced with `HEXCOLOR` and `NAMEDCOLOR`, and a `SQ_Color` rule includes these. Participants and arrows now use `SQ_Color`.
+
+2. **Encompass Elements**:
+   - `SQ_EncompassBegin` and `SQ_EncompassEnd` are replaced with a single rule `SQ_Encompass`, which includes elements within `box ... end box`.
+
+3. **Skinparam**:
+   - The value for `SQ_Skinparam` now uses `SQ_SkinparamValue`, which can be `SQ_Color`, `INT`, `ID`, or `STRING`.
+
+4. **ParameterMap for Requests**:
+   - Parameter maps in `PT_ParameterMap` use curly braces `{}` instead of square brackets `[]`.
+
+5. **SQ_Description**:
+   - SQ_Description has extra allowed characters/symbols like `'...'`, `'=='`, and `':'`.
+
+Given these differences, we can modify `Instance 1` to create `Instance 2` as follows:
+
+```plaintext
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+### Changes Made:
+- Colors in participant definitions and messages now use `SQ_Color` (`#eeaaaa`, `#aF7`, etc.) directly.
+- Replaced square brackets `[` and `]` surrounding parameters of `request` and `response` with curly braces `{}`.
+- Converted existing `box ... end box` to use the new `SQ_Encompass` rule format, although the original `Instance 1` format already conforms to this style.
+- All other optional changes such as `NAMEDCOLOR` weren't instantiated as requested.
+
+The modifications ensure alignment with `Grammar 2` while maintaining the original structure as much as possible.

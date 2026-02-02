@@ -1,24 +1,3 @@
-To adapt **Instance 1** to **Grammar 2**, we need to examine the changes that have occurred between **Grammar 1** and **Grammar 2**. Let's identify these changes:
-
-1. **Attribute Name Changes:**
-   - Attributes in **Grammar 2** have been changed from snake_case to camelCase:
-     - `batch-size` -> `batchSize`
-     - `image-size` -> `imageSize`
-     - `image-channels` -> `imageChannels`
-     - `output-labels` -> `outputLabels`
-     - `caffe-path` -> `caffePath`
-     - The attribute `operation` in **BranchBody** has been changed to `eltwiseOperation`.
-
-2. **Removed or Optional Attributes:**
-   - The attribute `type` in `BranchBody` is no longer present in **Grammar 2**.
-
-3. Additionally, all the additions are optional or are in an “OR” relationship.
-
-Given these differences, we can modify **Instance 1** to conform to **Grammar 2**.
-
-Here is how **Instance 2** will look based on **Instance 1** adapting changes from **Grammar 2**:
-
-```plaintext
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -51,9 +30,3 @@ network "DemoNet" {
 
 	dense  (name: finalLayer  out:labels)
 }
-```
-
-Summary of changes:
-- Updated instance conforms to camelCase naming convention for attributes.
-- Removed `'type -> residual'` from `branch` body as it doesn't exist in **Grammar 2**.
-- Changed `operation -> PROD` to `eltwiseOperation -> PROD`.

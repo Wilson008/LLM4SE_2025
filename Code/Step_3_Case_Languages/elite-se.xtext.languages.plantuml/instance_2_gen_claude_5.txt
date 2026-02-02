@@ -1,12 +1,7 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I need to modify instance_1 to conform to grammar_2. The main changes required are:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
-1. Parameter maps should use curly braces '{}' instead of square brackets '[]'
-2. Box structure should include all elements until 'end box'
-3. Color references need to stay the same as they are valid in both grammars
-
-Here's instance_2 with the necessary modifications:
-
+```
 @startuml
 
 ' Configuration
@@ -27,7 +22,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -38,18 +33,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
-"CCC-Mock" -> "CCC-Mock" : bootSkynet()
-return response(200||201, { event: "42" })
+... wait(10 s) Auf schönes Wetter ;)
 end box
+return response(200||201, { event: "42" })
 
-== Hier wirds kritisch ==
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -65,9 +61,20 @@ end
 [<-- Alice : Result 
 
 @enduml
+```
 
-Main changes made:
-1. Changed parameter map syntax from `[location : "dingolfing"]` to `{location : "dingolfing"}`
-2. Changed parameter map syntax from `[ event: "42" ]` to `{ event: "42" }`
-3. Restructured the box section to include all elements until 'end box'
-4. Maintained all formatting, comments, and whitespace as in the original
+**Changes made:**
+
+1. **Line 21**: Changed `[location : "dingolfing"]` to `{location : "dingolfing"}` (square brackets to curly braces for PT_ParameterMap)
+
+2. **Line 22**: Removed trailing `...` from the delay line (grammar_2's SQ_Delay no longer has optional trailing '...')
+
+3. **Line 24**: Removed trailing `==` from divider line (grammar_2's SQ_Divider no longer has trailing '==')
+
+4. **Line 25**: Changed `[ event: "42" ]` to `{ event: "42" }` (square brackets to curly braces for PT_ParameterMap)
+
+5. **Line 29**: Removed trailing `==` from divider line
+
+6. **Line 33**: Removed trailing `==` from divider line
+
+All other content, including comments, whitespace, indentation, and empty lines remain unchanged.

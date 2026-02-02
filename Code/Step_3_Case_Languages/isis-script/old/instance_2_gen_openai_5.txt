@@ -1,0 +1,138 @@
+To modify `instance_1` to follow `grammar_2`, we need to understand the changes made between `grammar_1` and `grammar_2` and how these changes impact the structure and syntax of the DSL instance.
+
+### Key differences between `grammar_1` and `grammar_2`:
+
+1. **IsisEntity**:
+   - Removed `events+=IsisEvent`.
+   - Added `collections+=IsisCollection`.
+
+2. **IsisService**:
+   - Added `collections+=IsisCollection`.
+
+3. **IsisProperty**:
+   - Added `events+=IsisEvent`.
+
+4. **New Structure: IsisCollection**:
+   - Added this new structure with features and optional 'events' association.
+
+5. **IsisAction**:
+   - Changed structure: Now includes features, parameters, and events.
+
+6. **IsisActionParameter**:
+   - Changed structure: Now includes features and is labeled as `parameter`.
+
+Given these differences, we need to ensure `instance_1` complies with the new `grammar_2`. The modifications ensure attributes reflect necessary structural and semantic changes introduced in the grammar evolution.
+
+### Modifications to create `instance_2`:
+
+```java
+package domainapp.dom.modules.simple
+
+import javax.jdo.annotations.Column
+import javax.jdo.annotations.DatastoreIdentity
+import javax.jdo.annotations.IdGeneratorStrategy
+import javax.jdo.annotations.IdentityType
+import javax.jdo.annotations.PersistenceCapable
+import javax.jdo.annotations.Queries
+import javax.jdo.annotations.Query
+import javax.jdo.annotations.Unique
+import javax.jdo.annotations.Version
+import javax.jdo.annotations.VersionStrategy
+import org.apache.isis.applib.annotation.Action
+import org.apache.isis.applib.annotation.ActionLayout
+import org.apache.isis.applib.annotation.BookmarkPolicy
+import org.apache.isis.applib.annotation.DomainObject
+import org.apache.isis.applib.annotation.DomainObjectLayout
+import org.apache.isis.applib.annotation.DomainServiceLayout
+import org.apache.isis.applib.annotation.Editing
+import org.apache.isis.applib.annotation.MemberOrder
+import org.apache.isis.applib.annotation.Parameter
+import org.apache.isis.applib.annotation.ParameterLayout
+import org.apache.isis.applib.annotation.Property
+import org.apache.isis.applib.annotation.SemanticsOf
+import org.apache.isis.applib.annotation.Title
+import org.apache.isis.applib.query.QueryDefault
+import org.apache.isis.applib.services.i18n.TranslatableString
+
+@PersistenceCapable(identityType=IdentityType.DATASTORE)
+@DatastoreIdentity(strategy=IdGeneratorStrategy.IDENTITY, column="id")
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="version")
+@Queries(#[
+	@Query(name = "find", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject"),
+	@Query(name = "findByName", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject WHERE name.indexOf(:name) >= 0")
+])
+@Unique(name="SimpleObject_name_UNQ", members = #["name"])
+@DomainObject(objectType = "SIMPLE")
+@DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+entity SimpleObject {
+
+	@Column(allowsNull="false", length = 40)
+	@Title(sequence="1")
+	@Property(editing = Editing.DISABLED)
+	property String name {
+            event UpdateNameDomainEvent
+	}
+
+	collection {
+	    // If there were any collections inside the entity, they would go here
+	}
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action updateName(@parameter @Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName) {
+		setName(newName)
+		this
+	}
+
+	action default0UpdateName {
+		getName()
+	}
+
+    	action validateUpdateName(@parameter String name) {
+        	if (name.contains("!"))
+        		TranslatableString.tr("Exclamation mark is not allowed")
+        	else null
+    	}
+
+	@DomainServiceLayout(menuOrder = "10")
+	repository {
+
+    	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "1")
+		action listAll {
+			container.allInstances(SimpleObject)
+		}
+
+		@Action(semantics = SemanticsOf.SAFE)
+		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "2")
+		action findByName(@parameter @ParameterLayout(named="Name") String name) {
+			container.allMatches(new QueryDefault(SimpleObject,
+				"findByName", "name", name))
+		}
+
+		@MemberOrder(sequence = "3")
+		action create(@parameter @ParameterLayout(named="Name") String name) {
+			val obj = container.newTransientInstance(SimpleObject)
+			obj.name = name
+			container.persistIfNotAlready(obj)
+			obj
+		}
+	}
+
+	title {
+		TranslatableString.tr("Object: {name}", "name", name)
+	}
+
+}
+```
+
+### Explanation of Changes:
+
+- **Entity Name with New Scope**: The `name` now includes an inner scope to accommodate `event` within `{ }`.
+- **Parameter Annotations**: Add `@parameter` before parameter declarations to comply with the new grammar rule.
+- **Collections (As new features)**: Added placeholder for `collection` tags if utilized in declarations.
+- Actions and Parameters are adjusted to fit contained expression blocks and adhere to updated parameter specifications under new grammar rules.

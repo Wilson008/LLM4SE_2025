@@ -1,17 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences and modify the instance accordingly. The main changes needed are:
-
-1. Action Definition Changes:
-   - Actions need to be restructured to use a block format with 'body' feature
-   - Parameters need to be declared with 'parameter' keyword inside action blocks
-
-2. Collections:
-   - Added in grammar_2 but optional, so we won't add any
-
-3. Repository:
-   - Removed in grammar_2, so need to remove repository section
-
-Here's the modified instance (instance_2) that conforms to grammar_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -64,21 +52,30 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action String updateName {
-		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+	action void updateName {
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
 		}
-		default {
+	}
+
+	action void default0UpdateName {
+		body {
 			getName()
 		}
-		validate {
-			if (name.contains("!"))
-				TranslatableString.tr("Exclamation mark is not allowed")
-			else null
-		}
 	}
+
+    	action void validateUpdateName {
+		parameter String name
+        	body {
+			if (name.contains("!"))
+        			TranslatableString.tr("Exclamation mark is not allowed")
+        		else null
+		}
+    	}
 
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
@@ -87,13 +84,12 @@ entity SimpleObject {
 }
 ```
 
-Key changes made:
-1. Moved event inside property block
-2. Restructured action 'updateName' with:
-   - Added block structure with curly braces
-   - Added 'parameter' keyword for parameters
-   - Moved default and validate logic into features
-   - Added 'body' feature for main action logic
-3. Removed entire repository section as it's no longer supported in grammar_2
-4. Maintained all original formatting, comments, and whitespace
-5. Didn't add any optional new elements from grammar_2 (like collections)
+**Key changes made:**
+
+1. **Event moved inside property**: `event UpdateNameDomainEvent` is now inside the `property String name` body block
+2. **Repository removed**: The entire `repository` block has been deleted (since IsisRepository is removed in grammar_2)
+3. **Action structure changed**: 
+   - Changed from `action updateName(...)` to `action void updateName {`
+   - Parameters now use `parameter` keyword inside the action body
+   - Action logic moved to `body { }` block
+4. **All actions updated**: `default0UpdateName` and `validateUpdateName` follow the new structure with `body` blocks and `parameter` declarations

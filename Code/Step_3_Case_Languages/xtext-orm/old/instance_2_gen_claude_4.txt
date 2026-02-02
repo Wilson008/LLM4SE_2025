@@ -1,0 +1,95 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between the grammars and modify instance_1 to conform to grammar_2.
+
+Main differences requiring changes:
+1. Grammar_2 requires a 'Configuration [...]' section at the beginning
+2. Options ([unique, not_null]) moved from Field level to FieldDeclaration level
+3. EntityField syntax changed to include directional notation (-> or <->)
+
+The modified instance (instance_2) should look like this:
+
+```
+Configuration [
+]
+
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1|->] sportshall: SportsHall [not_null]
+	
+	object [1..n|->] teams: Team
+	object [1..n|->] roles: ClubRole
+	object [1..n|->] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
+	
+	object [n..m|->] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n|->] information: Information
+	object [1..n|->] roles: ClubRole
+	
+	object [n..1|->] team: Team
+	object [n..1|->] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m|->] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+Changes made:
+1. Added empty 'Configuration []' section at the beginning
+2. Modified all EntityField declarations to include the directional notation '|->'
+   - Used unidirectional '->' as it's simpler and we don't have information about bidirectional relationships
+3. Maintained all existing formats, comments, and whitespace
+4. Kept all existing options and their positions as they're still valid in grammar_2
+5. Did not add any optional new features from grammar_2

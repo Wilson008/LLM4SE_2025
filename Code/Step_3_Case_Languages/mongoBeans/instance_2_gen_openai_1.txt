@@ -1,18 +1,29 @@
-To create Instance 2 based on Grammar 2, we need to analyze the differences between Grammar 1 and Grammar 2 and then apply those changes to Instance 1.
+Differences between Grammar 1 and Grammar 2 that affect the instance:
 
-### Differences between Grammar 1 and Grammar 2:
+1. **MongoBean declaration changed**
+   - **Grammar 1:** `mongobean` keyword is required:  
+     `MongoBean: 'mongobean' name=ValidID '{' ... '}'`
+   - **Grammar 2:** the `'mongobean'` keyword was removed:  
+     `MongoBean: name=ValidID '{' ... '}'`
 
-1. **MongoBean Definition**:
-   - **Grammar 2**: The keyword `mongobean` is removed from the `MongoBean` rule. Similarly, now only `name=ValidID` is required without the `mongobean` keyword.
+   So, in the instance, every `mongobean X { ... }` must become `X { ... }`.
 
-2. **MongoProperty**:
-   - In Grammar 2, `MongoProperty` can either have a `type=JvmTypeReference` or `inlineType=MongoBean`. The `inlineType` option is new, and it is an OR choice. However, we won't instantiate the optional parts as per the instructions.
+2. **MongoProperty extended with an OR option (do not instantiate)**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
 
-Given these differences, I'll modify Instance 1 into Instance 2 by removing the `mongobean` keyword from each `MongoBean`.
+   This adds an **optional alternative** (`inlineType=MongoBean`) but since it’s in an `OR` and not required, per your rule (2) we **do not use it**, and we keep the original typed properties as-is.
 
-### Modified Instance (Instance 2):
+3. **Everything else remains effectively the same for this instance**
+   - Imports, packages, operations, comments, and formatting can remain unchanged other than removing the `mongobean` keyword.
 
-```xtext
+---
+
+### Instance 2 (updated to follow Grammar 2, preserving formatting)
+
+```
+// Instance 2
+
 import java.util.*
 
 package org.musicdb {
@@ -64,7 +75,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-This modified instance now follows the structure of Grammar 2, specifically by removing the `mongobean` keyword as required. The rest of the structure remains unchanged, preserving all formatting, comments, and elements.

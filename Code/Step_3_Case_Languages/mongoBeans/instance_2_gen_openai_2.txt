@@ -1,20 +1,29 @@
-To adapt Instance 1 to comply with Grammar 2, we first need to identify the differences between Grammar 1 and Grammar 2:
+Differences between Grammar 1 and Grammar 2 that affect the instance:
 
-1. **Removal of 'mongobean' Keyword**: In Grammar 2, the keyword 'mongobean' is removed from the `MongoBean` rule. A `MongoBean` is now simply declared by providing its name.
+1. **MongoBean header changed**
+   - **Grammar 1:** `MongoBean: 'mongobean' name=ValidID '{' ... '}'`
+   - **Grammar 2:** `MongoBean: name=ValidID '{' ... '}'`
+   - Impact: the literal keyword **`'mongobean'` must be removed** from every bean declaration in the instance.
 
-2. **Change in `MongoProperty`**: Grammar 2 allows a `MongoBean` to be used as a type for `MongoProperty` through the optional use of `inlineType=MongoBean`. However, this is optional, so we will not use this feature in modifying the instance as per the instructions.
+2. **MongoProperty extended with an OR (optional alternative)**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
+   - Impact: This adds an alternative (`inlineType=MongoBean`), but per your rule (2), **we must not instantiate newly-added optional/OR alternatives**, so we keep using the existing `type=JvmTypeReference` form everywhere. No changes needed for properties.
 
-Based on these differences, let's update Instance 1 to create Instance 2:
+3. **Everything else is unchanged** (imports, package declaration, operations).
 
-```
-// No change in this part for imports and package
+---
+
+### Instance 2 (modified to follow Grammar 2)
+
+```xtend
 import java.util.*
 
 package org.musicdb {
 	/**
 	 * A musical performer
 	 */
-	Artist { // Removed 'mongobean' keyword
+	Artist {
 		String name
 		Album* albums
 		
@@ -26,7 +35,7 @@ package org.musicdb {
 	/**
 	 * A record, CD, DVD or another collection of tracks
 	 */
-	Album { // Removed 'mongobean' keyword
+	Album {
 		String title
 		int year 
 		Track* tracks
@@ -36,12 +45,12 @@ package org.musicdb {
 		}
 	}
 	
-	Track { // Removed 'mongobean' keyword
+	Track {
 		String title
 		Duration duration
 	}
 	
-	Duration { // Removed 'mongobean' keyword
+	Duration {
 		int seconds
 	
 		void fromString(String duration) {
@@ -59,7 +68,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-In this transformation, the key change has been the removal of the 'mongobean' keyword. The rest of the structure, comments, and whitespace remain unchanged to ensure the adaptation respects both the new grammar rules and the format of the original instance.

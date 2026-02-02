@@ -1,0 +1,36 @@
+=== Step 3: Instance Transformation ===
+After analyzing the differences between grammar_1 and grammar_2, and following the rules you provided, I need to make the following modifications to instance_1 to create instance_2:
+
+1. Change array declarations:
+   - From: `int[n] c (subtask 1 : 1..100)` style
+   - To: `int [n] c (subtask 1 : 1..100)` style
+   (Add a space after type before '[')
+
+2. Change 'value' keyword to 'sp':
+   - However, this keyword doesn't appear in instance_1, so no change needed
+
+3. The instance follows grammar_1's format expressions, but since grammar_2's format expressions are backward compatible (more structured but can handle the same syntax), no changes needed for format sections.
+
+4. The select helper function syntax changed, but no select functions in the instance use the range parameter (var3..var4), so no changes needed.
+
+Therefore, instance_2 should only differ from instance_1 in the array declarations. Here are the specific lines that need to change:
+
+From:
+```
+int[n] c (subtask 1 : 1..100)
+int[n] p (subtask 1 : 1..100)
+int[n] t (subtask 1 : 1..100)
+int[n] y (0..1)
+```
+
+To:
+```
+int [n] c (subtask 1 : 1..100)
+int [n] p (subtask 1 : 1..100)
+int [n] t (subtask 1 : 1..100)
+int [n] y (0..1)
+```
+
+All other parts of the instance should remain exactly the same, including all comments, white spaces, indentation, and empty lines.
+
+Would you like me to show you the complete instance_2 with these changes?

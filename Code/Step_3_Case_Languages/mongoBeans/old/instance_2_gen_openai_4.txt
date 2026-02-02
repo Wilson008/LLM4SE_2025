@@ -1,0 +1,64 @@
+To convert Instance 1 to Instance 2, we first need to recognize the changes between Grammar 1 and Grammar 2:
+
+1. **Removal of the 'mongobean' keyword:** In Grammar 2, the keyword 'mongobean' has been removed from the definition of `MongoBean`.
+
+2. **Addition of inline types:** In Grammar 2, the `MongoProperty` allows for an `inlineType` as a `MongoBean`, but this is optional, so we don't need to make any changes based on this rule.
+
+Given these differences, we need to remove the 'mongobean' keyword before each MongoBean instance in Instance 1 to comply with Grammar 2. Here's what Instance 2 would look like:
+
+```plaintext
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+The only changes made are the removal of 'mongobean' before each bean definition to reflect the adjustment in Grammar 2. All other content, including comments, whitespaces, and formatting, remains unchanged.

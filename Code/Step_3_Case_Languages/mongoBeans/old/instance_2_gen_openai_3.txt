@@ -1,0 +1,69 @@
+To modify `instance_1` into `instance_2` based on the changes between `Grammar 1` and `Grammar 2`, we need to analyze the differences:
+
+1. **Removal of 'mongobean' keyword**: 
+   - In `Grammar 2`, the keyword 'mongobean' preceding the `MongoBean` definition has been removed.
+
+2. **Modification in `MongoProperty`**:
+   - In `Grammar 2`, a `MongoProperty` can now either be of `JvmTypeReference` or an inline `MongoBean`. This is optional and doesn't affect existing instance content since it involves a new feature that isn't part of `instance_1`.
+
+Based on these differences, the modified instance (`instance_2`) should look like this:
+
+```
+// The imports can remain unchanged
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+Changes made:
+- Removed the 'mongobean' keyword in each `MongoBean`. The rest of the structure remains intact.
+- No inline `MongoBean` usage or other optional constructs are added as they are new features and not utilized in the original instance.

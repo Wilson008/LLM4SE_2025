@@ -1,14 +1,14 @@
 === Step 3: Instance Transformation ===
-I'll analyze the main differences between grammar_1 and grammar_2, and modify instance_1 accordingly:
+Based on the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
-Key differences that require instance modification:
-1. Grammar_2 requires a mandatory 'Configuration' section at the beginning
-2. In grammar_2, field options are wrapped in a FieldDeclaration rule
-3. In grammar_2, EntityField rule requires a directionality indicator (-> or <->)
-
-Since we need to maintain the format and follow rule #2 (not instantiating optional elements), here's how instance_1 should be modified:
-
+```
 Configuration [
+	Java [
+		genpath src/main/java
+		package com.example.persistence
+		ORM Hibernate
+		
+	]
 ]
 
 entity Club {
@@ -83,9 +83,12 @@ entity TrainingSession {
 	
 	backref [Club.sessions] club [not_null]
 }
+```
 
-The main changes made:
-1. Added minimal required 'Configuration []' section at the beginning
-2. Added directionality indicator '| ->' to all EntityField declarations
-3. Preserved all formatting, comments, and whitespace
-4. Did not instantiate optional configuration elements
+**Key changes made:**
+
+1. **Added Configuration section** at the beginning with a Java configuration (mandatory in grammar_2). I chose not to add Python configuration since it's in an OR relationship.
+
+2. **Modified all EntityField declarations** to include the directionality indicator. Since the choice is between `bidirectional` ('<->') or `unidirectional` ('->'), I chose unidirectional ('->') as the default for all object fields.
+
+3. **Preserved all formatting**: comments, indentation, empty lines, and whitespace exactly as in the original instance.

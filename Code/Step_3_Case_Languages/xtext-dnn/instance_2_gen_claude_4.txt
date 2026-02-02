@@ -1,11 +1,5 @@
 === Step 3: Instance Transformation ===
-Based on the differences between grammar_1 and grammar_2, I'll modify instance_1 to create instance_2 that conforms to grammar_2. The main changes needed are:
-
-1. Change kebab-case to camelCase for parameter names
-2. Change branch-related syntax
-3. Update the layer name 'final-layer' to 'finalLayer'
-
-Here's instance_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance_2 that conforms to grammar_2:
 
 ```
 network "DemoNet" {
@@ -42,18 +36,18 @@ network "DemoNet" {
 }
 ```
 
-The changes made are:
-1. 'batch-size' → 'batchSize'
-2. 'image-size' → 'imageSize'
-3. 'image-channels' → 'imageChannels'
-4. 'output-labels' → 'outputLabels'
-5. 'caffe-path' → 'caffePath'
-6. 'output-path' → 'outputPath'
-7. 'kernel-size' → 'kernelSize'
-8. Removed 'type -> residual' in branch block
-9. 'operation -> PROD' → 'eltwiseOperation -> PROD'
-10. 'use-global-stats' → 'useGlobalStats'
-11. 'use-bias-term' → 'useBiasTerm'
-12. 'final-layer' → 'finalLayer'
+**Changes made:**
+1. `batch-size` → `batchSize`
+2. `image-size` → `imageSize`
+3. `image-channels` → `imageChannels`
+4. `output-labels` → `outputLabels`
+5. `caffe-path` → `caffePath`
+6. `output-path` → `outputPath`
+7. `kernel-size` → `kernelSize` (in all conv layers)
+8. `operation` → `eltwiseOperation` (in branch body)
+9. Removed `type -> residual` line (as BranchType enum and the type field were removed in grammar_2)
+10. `use-global-stats` → `useGlobalStats`
+11. `use-bias-term` → `useBiasTerm`
+12. `final-layer` → `finalLayer`
 
-I've maintained all formatting, including white spaces, indents, and empty lines, exactly as they appeared in the original instance.
+All formatting, whitespace, indentation, and comments have been preserved exactly as in the original instance.

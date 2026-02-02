@@ -1,13 +1,5 @@
 === Step 3: Instance Transformation ===
-After analyzing the differences between grammar_1 and grammar_2, I notice that:
-1. The 'mongobean' keyword is removed in grammar_2's MongoBean rule
-2. The MongoProperty rule adds an optional inline MongoBean type definition (inlineType=MongoBean | type=JvmTypeReference)
-
-According to the modification rules:
-1. I need to remove all 'mongobean' keywords
-2. I don't need to add any inline MongoBean types since it's in an "OR" relationship with type=JvmTypeReference
-
-Here's instance_2 that follows grammar_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
 ```
 import java.util.*
@@ -64,4 +56,7 @@ package org.musicdb {
 } 
 ```
 
-The only change made was removing all 'mongobean' keywords while preserving all other formatting, comments, and content exactly as they were in the original instance.
+**Changes made:**
+- Removed the `mongobean` keyword before each bean declaration (Artist, Album, Track, Duration) as it's no longer part of the MongoBean rule in grammar_2
+- The new optional `inlineType=MongoBean` alternative in MongoProperty was not instantiated (following rule 2)
+- All comments, whitespace, indentation, and formatting have been preserved exactly as in instance_1

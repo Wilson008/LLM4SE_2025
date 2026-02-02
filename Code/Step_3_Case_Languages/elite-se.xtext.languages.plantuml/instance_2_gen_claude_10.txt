@@ -1,12 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the key differences between the grammars and modify the instance accordingly. The main changes needed are:
-
-1. Parameter Map syntax: Change from '[...]' to '{...}'
-2. Box/Encompass structure: Change from separate 'box'/'end box' to a combined structure
-3. Color references: No change needed as both HEXCOLOR and NAMEDCOLOR in grammar_2 can handle the existing color formats
-4. Divider format: Remove trailing '==' in dividers
-
-Here's the modified instance (instance_2) with the necessary changes:
+Based on my analysis of the differences between grammar_1 and grammar_2, here is instance_2 that conforms to grammar_2:
 
 ```
 @startuml
@@ -40,8 +33,9 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
-return response(200||201, {event: "42"})
+... wait(10 s) Auf schönes Wetter ;)
+end box
+return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
@@ -69,11 +63,10 @@ end
 @enduml
 ```
 
-Main changes made:
-1. Changed parameter map syntax from `[location : "dingolfing"]` to `{location : "dingolfing"}`
-2. Changed parameter map syntax from `[event: "42"]` to `{event: "42"}`
-3. Removed trailing '==' from divider lines
-4. Kept all formatting, comments, and whitespace exactly as in the original
-5. Maintained all colors in their original format as they're compatible with both grammars
+## Changes made:
 
-All other elements remain unchanged as they are compatible with both grammar versions.
+1. **Divider closing `==` removed**: Changed `== Initialization ==` to `== Initialization` (and same for other dividers)
+2. **Delay closing `...` removed**: Changed `... wait(10 s) Auf schönes Wetter ;) ...` to `... wait(10 s) Auf schönes Wetter ;)`
+3. **Parameter map brackets changed**: Changed `[location : "dingolfing"]` to `{location : "dingolfing"}` and `[ event: "42" ]` to `{ event: "42" }`
+
+All other elements remain unchanged, including comments, whitespace, indentation, and formatting.

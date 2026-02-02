@@ -1,26 +1,52 @@
-To evolve `Instance 1` from `Grammar 1` to `Grammar 2`, we need to analyze the changes made between the two versions of the grammar:
+## Differences (Grammar 1 → Grammar 2)
 
+1. **Top-level members inside `entity`**
+   - **Removed**: `events+=IsisEvent` (entity-level `event ...` is no longer allowed directly in `IsisEntity`).
+   - **Removed**: `repositories+=IsisRepository` (the whole `repository { ... }` construct no longer exists).
+   - **Added**: `collections+=IsisCollection` (new, but optional; per your rule, we won’t instantiate it).
 
-**Changes in Grammar:**
+2. **`IsisProperty` contents**
+   - Grammar 1: property body contained only `features+=IsisPropertyFeature*` and **property features had no annotations**.
+   - Grammar 2: property body can contain `(features+=IsisPropertyFeature | events+=IsisEvent)*`.
+   - Property features now allow `annotations+=XAnnotation*` (optional; we won’t add any).
+   - Property feature enum extended (added `Complete`; order changed), but this only matters if used.
 
-1. **Removal of `IsisEvent` from an `IsisEntity`:** The `IsisEvent` rule has been removed as a direct child element of `IsisEntity`. Now `IsisEvent` appears within properties, collections, and actions. 
-   
-2. **Introduction of `IsisCollection`:** A new rule for defining collections (`IsisCollection`) has been introduced.
+3. **`IsisAction` syntax changed (major)**
+   - Grammar 1:  
+     `action (returnType)? name '(' params? ')' expression=XBlockExpression`
+   - Grammar 2:  
+     `action type=JvmTypeReference name '{' (features | parameters | events)* '}'`
+   - So:
+     - Parenthesized parameter list is gone.
+     - Action body is now a block with explicit sections:
+       - `body { ... }` feature for implementation
+       - `parameter ...` blocks for parameters
+       - optional `event ...` inside the action (we won’t add unless required)
+     - `type` is **required** in Grammar 2 (not optional).
 
-3. **Changes in `IsisProperty`:** Now, `IsisProperty` can contain `IsisEvent` as a feature alongside `IsisPropertyFeature`.
+4. **`IsisActionParameter` syntax changed**
+   - Grammar 1: parameters were just `type=FullJvmFormalParameter` (plus optional annotations).
+   - Grammar 2: parameters must be introduced by the keyword **`parameter`**, and may have a `{ ... }` of parameter-features (optional; we won’t instantiate).
 
-4. **Changes in `IsisAction`:** 
-   - `IsisAction` now has `IsisEvent` alongside `parameters` and `features`.
-   - Parameters are now labeled as `IsisActionParameter` with a `parameter` keyword and can have `IsisActionParameterFeature`.
+5. **`IsisService` members**
+   - Now allows `collections` too (optional; not instantiated).
 
-5. **Changes in Enums:**
-   - New features like `Complete` in `IsisPropertyFeatureType` and `Add`, `Remove` in `IsisCollectionFeatureType`.
+6. **`IsisEvent`**
+   - Still exists, but now only appears inside `property`, `collection`, `action` blocks (not at entity root).
 
-Now, let's modify `Instance 1` into `Instance 2` according to `Grammar 2`, keeping in mind the constraints given:
+7. **`IsisRepository`**
+   - Completely removed from Grammar 2, so any `repository { ... }` must be removed or transformed (there is no direct replacement rule in Grammar 2).
 
-**Instance 2:**
+---
 
-```plaintext
+## Instance 2 (updated to follow Grammar 2)
+
+Below is **Instance 1 transformed** to conform to Grammar 2, while:
+- preserving all formatting/whitespace/indentation as much as possible,
+- keeping all single-quoted keywords from the grammar (e.g., `entity`, `property`, `action`, `parameter`, `body`, etc.),
+- not instantiating newly-added optional constructs (`collection`, action/property/parameter `event`, parameter features, etc.).
+
+```xtend
 package domainapp.dom.modules.simple
 
 import javax.jdo.annotations.Column
@@ -66,62 +92,49 @@ entity SimpleObject {
 	@Column(allowsNull="false", length = 40)
 	@Title(sequence="1")
 	@Property(editing = Editing.DISABLED)
-	property String name {
-        event UpdateNameDomainEvent
-    }
+	property String name
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action updateName(@parameter @Parameter(maxLength = 40)
-            @ParameterLayout(named = "New name") String newName) {
-		setName(newName)
-		this
+	action SimpleObject updateName {
+		parameter @Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName
+		body {
+			setName(newName)
+			this
+		}
 	}
 
-	action default0UpdateName() {
-		getName()
+	action String default0UpdateName {
+		body {
+			getName()
+		}
 	}
 
-    	action validateUpdateName(String name) {
-        	if (name.contains("!"))
-        		TranslatableString.tr("Exclamation mark is not allowed")
-        	else null
+    	action TranslatableString validateUpdateName {
+    		parameter String name
+		body {
+	        	if (name.contains("!"))
+	        		TranslatableString.tr("Exclamation mark is not allowed")
+	        	else null
+		}
     	}
-
-	@DomainServiceLayout(menuOrder = "10")
-	repository {
-
-    	@Action(semantics = SemanticsOf.SAFE)
-    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-		@MemberOrder(sequence = "1")
-		action listAll() {
-			container.allInstances(SimpleObject)
-		}
-
-		@Action(semantics = SemanticsOf.SAFE)
-		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-		@MemberOrder(sequence = "2")
-		action findByName(@parameter @ParameterLayout(named="Name") String name) {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
-		}
-
-		@MemberOrder(sequence = "3")
-		action create(@parameter @ParameterLayout(named="Name") String name) {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
-		}
-	}
 
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
 	}
+
 }
 ```
 
-**Summary of Changes in Instance 2:**
+### Notes on the required changes applied
+- Removed the entity-level line:
+  - `event UpdateNameDomainEvent` (no longer allowed at entity root in Grammar 2).
+- Converted each `action ...(...) { ... }` into Grammar 2 structure:
+  - `action <Type> <name> { parameter ... body { ... } }`
+- Removed the entire `repository { ... }` block because `IsisRepository` is not in Grammar 2.
+- Chose required action return `type` values without adding new optional constructs:
+  - `updateName` returns `SimpleObject` (because the body ends with `this`).
+  - `default0UpdateName` returns `String` (it returns `getName()`).
+  - `validateUpdateName` returns `TranslatableString` (consistent with the original validation message; Grammar 2 requires a type).
 
-- Enclosed each `parameter` in actions with `@parameter` to match the new `IsisActionParameter` definition.
-- Placed `events` inside properties following the change in `IsisProperty`.
-- Retained all formatting and comments from `Instance 1`.
+If you want, I can also produce a version that preserves the repository actions by converting them into a `service` declaration (since Grammar 2 still supports `service { ... }`), but that would introduce a *new* top-level type not present in Instance 1, and you didn’t ask for that.

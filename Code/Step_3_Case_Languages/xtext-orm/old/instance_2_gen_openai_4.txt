@@ -1,0 +1,101 @@
+To evolve the given instance (Instance 1) to be compatible with Grammar 2, we need to analyze the differences between the two versions of the grammar first.
+
+**Differences between Grammar 1 and Grammar 2:**
+
+1. **Configuration Section:**
+   - Grammar 2 introduces a new `Configuration` section in `PersistenceModel`, which involves either `JavaConfiuration` or `PythonConfiguration`.
+   - Instance 1, which was designed for Grammar 1, does not have this section. Considering the rules stated, since these configurations are optional, they should not be added.
+
+2. **Entity Structure:**
+   - The `Entity` structure now includes `fieldDeclarations` instead of just `fields`. The difference being `FieldDeclaration`, which includes `field=Field` followed by optional `[options+=TypeOption (',' options+=TypeOption)?]`.
+
+3. **Field Declarations:**
+   - Fields have been modified to be encapsulated within `FieldDeclaration`, which allows specifying TypeOptions separately.
+   
+4. **EntityField Definition:**
+   - The `EntityField` now includes the additional option of specifying a direction, either `bidirectional ?= '<->'` or `unidirectional ?= '->'`. Since this is optional and indicated with `|`, do not add any direction to the evolved instance.
+
+5. **Removal of Options from Fields:**
+   - In Grammar 2, the options such as `unique` and `not_null` are moved out of Field definitions and can be attached at the FieldDeclaration level.
+
+Based on these modifications:
+
+**Instance 2 (evolved format from Instance 1):**
+
+```plaintext
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1 | ] sportshall: SportsHall
+	object [1..n | ] teams: Team
+	object [1..n | ] roles: ClubRole
+	object [1..n | ] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1 | ] leader: Player // UseAlter when a cyclic dependency occurs
+	object [n..m | ] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n | ] information: Information
+	object [1..n | ] roles: ClubRole
+	
+	object [n..1 | ] team: Team
+	object [n..1 | ] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m | ] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+Explanation:
+- Fields are declared inside entities with `field=Field`, and options are specified separately as `[options]`.
+- The cardinality now includes an optional direction indicator such as `|`, but since it’s not instantiated, we ignore adding directions by simply placing `| ` before entities in `EntityField`.
+- The optional configurations for Java and Python were not added as they are specified as optional in Grammar 2.

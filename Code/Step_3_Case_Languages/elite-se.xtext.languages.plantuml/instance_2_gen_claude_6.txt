@@ -1,18 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 to create instance_2 that conforms to grammar_2. The main changes needed are:
-
-1. Color syntax changes:
-   - From COLOR to HEXCOLOR/NAMEDCOLOR through SQ_Color rule
-   - Need to modify color values like #eeaaaa, #aF7, #8877cc, #0000aa, #ffaaaa, #eba
-
-2. Parameter Map syntax:
-   - Change from '[...]' to '{...}'
-
-3. Box/Encompass structure:
-   - Change from separate 'box' and 'end box' to a nested structure
-   - No structural change needed as the instance already uses this pattern
-
-Here's instance_2 with the necessary modifications:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
 ```
 @startuml
@@ -35,7 +22,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -46,19 +33,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
+... wait(10 s) Auf schönes Wetter ;) 
 end box
 return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
-== Hier wirds kritisch ==
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -76,13 +63,14 @@ end
 @enduml
 ```
 
-The main changes made were:
-1. Changed parameter map syntax from '[...]' to '{...}' in:
-   - request(..., [location : "dingolfing"]) → request(..., {location : "dingolfing"})
-   - response(..., [ event: "42" ]) → response(..., { event: "42" })
+**Key changes made:**
 
-2. Kept all colors as they were since both HEXCOLOR and NAMEDCOLOR are valid in grammar_2
+1. **Divider syntax**: Removed closing `==` from dividers (lines with `== Initialization ==`, `== Hier wirds kritisch ==`, `== Schicksalskram ==`)
 
-3. Maintained all formatting, comments, and whitespace exactly as in the original instance.
+2. **Delay syntax**: Removed closing `...` from the delay line (`... wait(10 s) Auf schönes Wetter ;) ...` → `... wait(10 s) Auf schönes Wetter ;) `)
 
-All other elements were kept unchanged as they conform to both grammars.
+3. **Parameter maps**: Changed brackets from `[` `]` to `{` `}` in request/response parameter maps:
+   - `[location : "dingolfing"]` → `{location : "dingolfing"}`
+   - `[ event: "42" ]` → `{ event: "42" }`
+
+All other elements remain unchanged, including whitespace, comments, and formatting.

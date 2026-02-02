@@ -1,21 +1,3 @@
-To evolve `Instance 1` according to the differences between `Grammar 1` and `Grammar 2`, let's first identify the key changes between the grammars:
-
-1. **Color Syntax Changes**:
-    - `Grammar 2` introduces a new rule for colors: `SQ_Color`.
-    - Colors are divided into `HEXCOLOR` and `NAMEDCOLOR`. The former uses a hex code, while the latter allows named color values.
-    - Color references in various grammar rules have been updated to use `SQ_Color` instead of `COLOR`.
-
-2. **Encompassing Elements**:
-    - The encompassing elements for blocks (`box` and `end box`) are changed to the use of `SQ_Encompass`, where it's clear that an `end` `box` follows the `box` statements.
-  
-3. **PT_ParameterMap Syntax Change**:
-    - Parameter maps now use curly braces `{}` instead of square brackets `[]`.
-
-With these changes in mind, here is `Instance 2` that aligns with `Grammar 2`:
-
-```
-// Instance 2
-
 @startuml
 
 ' Configuration
@@ -75,12 +57,3 @@ end
 [<-- Alice : Result 
 
 @enduml
-```
-
-### Key Changes Made:
-
-- Updated color references to use `SQ_Color`, reflecting the changes to color handling in `Grammar 2`.
-- Updated parameter map brackets to `{}` instead of `[]`.
-- Updated the encompassing behavior using `box` and `end box` to adhere to the new handling of these constructs in `Grammar 2`.
-  
-In keeping with the instructions, all formatting, comments, and structural elements of `Instance 1` have been preserved, and only necessary modifications reflecting `Grammar 2` changes were made.

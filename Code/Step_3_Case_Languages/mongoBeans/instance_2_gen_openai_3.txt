@@ -1,15 +1,20 @@
-To modify `instance_1` into `instance_2` based on the changes between `Grammar 1` and `Grammar 2`, we need to analyze the differences:
+Differences between **Grammar 1** and **Grammar 2** that affect the concrete syntax:
 
-1. **Removal of 'mongobean' keyword**: 
-   - In `Grammar 2`, the keyword 'mongobean' preceding the `MongoBean` definition has been removed.
+1. **MongoBean rule changed**
+   - **Grammar 1:** `MongoBean: 'mongobean' name=ValidID '{' ... '}';`
+   - **Grammar 2:** `MongoBean: name=ValidID '{' ... '}';`
+   - Effect: the literal keyword **`'mongobean'` is removed**, so each bean declaration must start directly with the name.
 
-2. **Modification in `MongoProperty`**:
-   - In `Grammar 2`, a `MongoProperty` can now either be of `JvmTypeReference` or an inline `MongoBean`. This is optional and doesn't affect existing instance content since it involves a new feature that isn't part of `instance_1`.
+2. **MongoProperty rule extended (optional/OR)**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
+   - Effect: properties may alternatively use an inline bean type, but since this is an **OR addition**, per your rule (2) we **do not instantiate** the new alternative. So we keep using `JvmTypeReference` as before (e.g., `String name`, `Album* albums`, etc.).
 
-Based on these differences, the modified instance (`instance_2`) should look like this:
+So the only required textual change to make **Instance 1** conform to **Grammar 2** is: remove the `mongobean` keyword before each bean name, keeping everything else (including whitespace/formatting/comments) unchanged.
 
-```
-// The imports can remain unchanged
+Here is **Instance 2** (updated to follow Grammar 2):
+
+```text
 import java.util.*
 
 package org.musicdb {
@@ -61,9 +66,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-Changes made:
-- Removed the 'mongobean' keyword in each `MongoBean`. The rest of the structure remains intact.
-- No inline `MongoBean` usage or other optional constructs are added as they are new features and not utilized in the original instance.

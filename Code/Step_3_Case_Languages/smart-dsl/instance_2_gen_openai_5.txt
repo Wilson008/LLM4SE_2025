@@ -1,17 +1,29 @@
-To modify Instance 1 to conform to Grammar 2, we need to consider the differences between Grammar 1 and Grammar 2. Let's first summarize the changes:
+Differences between Grammar 1 and Grammar 2 (relevant to evolving the instance):
 
-1. **Modifier to Validator**: 
-   - The `Modifier` grammar rule in Grammar 1 has been replaced with `Validator` in Grammar 2. This change affects both the definition and usage within the `Method`.
+1. **`Modifier` was renamed to `Validator`**
+   - Grammar 1 rule: `Modifier: 'Modifier' ...`
+   - Grammar 2 rule: `Validator: 'validator' ...`
+   - So instances must change:
+     - The keyword **`Modifier`** → **`validator`**
+     - The contract-level feature list **`modifiers+=Modifier`** → **`validators+=Validator`**
 
-2. **New Grammar Rule: `DataStore`**:
-   - Grammar 2 introduces a new `DataStore` rule, but since it is an optional addition, we will not instantiate it.
+2. **In `Method`, the section label and reference type changed**
+   - Grammar 1 inside `Method`: `modifiersKeyword='modifiers:' modifiers+=[Modifier] ...`
+   - Grammar 2 inside `Method`: `modifiersKeyword='validators:' validators+=[Validator] ...`
+   - So instances must change:
+     - The keyword **`modifiers:`** → **`validators:`**
+     - The referenced names remain the same identifiers, but they now refer to `Validator` elements.
 
-3. **Method Keyword Adjustment**:
-   - In `Method`, the keyword `modifiers:` has been changed to `validators:` in Grammar 2.
+3. **`DataStore` was added and `dataStores+=DataStore` added to `Contract`**
+   - This is a new optional/`*` alternative in the contract body (`... | dataStores+=DataStore`), so per your rule (2), it should **not** be instantiated.
 
-Now, let's modify Instance 1 to create Instance 2 that adheres to Grammar 2:
+4. Everything else used in Instance 1 remains compatible (e.g., `Contract`, `version:`, `hasReceive`, `ownership`, `Attribute`, `method`, `event`, params/outputs, etc.).
 
-```plaintext
+---
+
+### Instance 2 (updated to follow Grammar 2)
+
+```dsl
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -43,8 +55,3 @@ Contract SimpleContract {
 	}
 }
 ```
-
-### Modifications Made:
-- Changed `Modifier` to `validator` in the declarations.
-- Changed the keyword `modifiers:` to `validators:` in the `method` block.
-- Ensured that all other aspects (formatting, comments, etc.) remained consistent with Instance 1.

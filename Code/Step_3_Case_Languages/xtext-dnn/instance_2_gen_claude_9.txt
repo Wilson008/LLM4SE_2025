@@ -1,6 +1,7 @@
 === Step 3: Instance Transformation ===
-I'll modify instance_1 according to the differences between grammar_1 and grammar_2, following your guidelines. Here's instance_2:
+Based on the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
+```
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -32,25 +33,19 @@ network "DemoNet" {
 
 	dense  (name: finalLayer  out:labels)
 }
+```
 
-The changes I made are:
-1. Changed hyphenated parameter names to camelCase:
-   - 'batch-size' → 'batchSize'
-   - 'image-size' → 'imageSize'
-   - 'image-channels' → 'imageChannels'
-   - 'output-labels' → 'outputLabels'
-   - 'kernel-size' → 'kernelSize'
-   - 'use-global-stats' → 'useGlobalStats'
-   - 'use-bias-term' → 'useBiasTerm'
+**Changes applied:**
+1. `batch-size` → `batchSize`
+2. `image-size` → `imageSize`
+3. `image-channels` → `imageChannels`
+4. `output-labels` → `outputLabels`
+5. Removed `caffe-path = "$CAFFE_HOME"` (now optional in grammar_2, so not instantiating)
+6. `output-path` → `outputPath`
+7. `kernel-size` → `kernelSize` (in all conv layers)
+8. In branch body: `operation` → `eltwiseOperation` and removed `type -> residual` line
+9. `use-global-stats` → `useGlobalStats`
+10. `use-bias-term` → `useBiasTerm`
+11. `final-layer` → `finalLayer`
 
-2. Removed 'caffe-path' since it's optional in grammar_2
-
-3. Changed 'output-path' → 'outputPath'
-
-4. In the branch section:
-   - Removed 'type -> residual' since BranchType is removed in grammar_2
-   - Changed 'operation' to 'eltwiseOperation'
-
-5. Changed 'final-layer' → 'finalLayer'
-
-I maintained all formatting, including white spaces, indentation, and empty lines from the original instance.
+All formatting, whitespace, indentation, and comments have been preserved exactly as in the original instance.

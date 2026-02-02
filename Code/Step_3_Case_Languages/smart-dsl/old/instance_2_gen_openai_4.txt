@@ -1,0 +1,47 @@
+To modify Instance 1 so that it conforms to Grammar 2, let's first analyze the differences between Grammar 1 and Grammar 2:
+
+1. **Replaced Rule:** 
+   - In Grammar 2, the `Modifier` rule has been replaced by the `Validator` rule with similar structure.
+
+2. **Additional Rule:** 
+   - Grammar 2 introduces a new rule `DataStore`, which is not used in Instance 2 as per your instructions because it's optional.
+
+3. **Change in Method:**
+   - The keyword `modifiers:` in the `Method` rule has been changed to `validators:` in Grammar 2.
+
+Now, let's reflect these changes in the instance:
+
+```plaintext
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+The instance now follows Grammar 2. The `Modifier` rule-related sections have been changed to `Validator`, and the `modifiers:` keyword has been changed to `validators:` in the method. Optional additions from Grammar 2 such as `DataStore` are not instantiated, as instructed.

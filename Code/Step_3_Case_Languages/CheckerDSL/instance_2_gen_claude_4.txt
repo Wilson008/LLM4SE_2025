@@ -1,11 +1,5 @@
 === Step 3: Instance Transformation ===
-After analyzing the differences between grammar_1 and grammar_2, I need to make the following modifications to instance_1 to create instance_2:
-
-1. Change `value` to `sp` in ChkVariableDeclaration rule
-2. Modify array declarations: remove the arr+= symbol
-3. Update `select` function calls by adding range specification with ':'
-
-Here's instance_2 (modified instance_1):
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the modified instance that conforms to grammar_2:
 
 ```
 // Specification untuk soal knapsack Polo the Penguin and the Test
@@ -57,7 +51,7 @@ class Knapsack{
 	}
 	
 	MR 1 {
-		(select(k,l : 1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and c[k]!=c[l] or p[k]!=p[l] or t[k]!=t[l])
 		followup {
 			(c` = swap(c,k,l))
 			(p` = swap(p,k,l))
@@ -70,7 +64,7 @@ class Knapsack{
 	}
 	
 	MR 3 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:0..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(t`[k] = t[k]+cc)
@@ -81,7 +75,7 @@ class Knapsack{
 	}
 	
 	MR 4 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:0..n) where y[k]==0)
 		(def cc = random(0..100))
 		followup {
 			(p`[k] = p[k]-cc)
@@ -117,7 +111,7 @@ class Knapsack{
 	}
 	
 	MR 7 {
-		(select(k : 1..n) where y[k]==0)
+		(select(k:0..n) where y[k]==0)
 		followup {
 			(n` = n-1)
 			(c` = remove(c,k))
@@ -130,7 +124,7 @@ class Knapsack{
 	}
 	
 	MR 8 {
-		(select(k : 1..n) where y[k]==1)
+		(select(k:0..n) where y[k]==1)
 		followup {
 			(n` = n-1)
 			(c`[1] = c[1]-t[k])
@@ -144,7 +138,7 @@ class Knapsack{
 	}
 	
 	MR 9 {
-		(select(k,l : 1..n) where 1<=k and k<l and l<=n and y[k]==1 and y[l]==1)
+		(select(k,l:1..n) where 1<=k and k<l and l<=n and y[k]==1 and y[l]==1)
 		followup {
 			(c`[k] = 1)
 			(p`[k] = c[k]*p[k]+c[l]*p[l])
@@ -152,4 +146,41 @@ class Knapsack{
 			(n` = n-1)
 			(c` = remove(c,l))
 			(p` = remove(p,l))
-			(t` = remove
+			(t` = remove(t,l))
+		}
+		check {
+			
+		}
+	}
+	
+	MR 11 {
+		(select(k:0..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(p`[k] = p[k]+cc)
+		}
+		check {
+			(point` = point+cc*c[k])
+		}
+	}
+	
+	MR 12 {
+		(select(k:0..n) where y[k]==1)
+		(def cc = random(0..100))
+		followup {
+			(c`[k] = c[k]+cc)
+		}
+		check {
+			(point` = point+cc*p[k])
+		}
+	}
+}
+```
+
+**Key changes made:**
+
+1. **Updated all `select()` calls** to include the mandatory range specification with colon separator (`:`) as required by grammar_2. For example:
+   - `select(k,l)` → `select(k,l:1..n)`
+   - `select(k)` → `select(k:0..n)`
+
+The ranges were inferred from the context where the variables are used (e.g., array indices suggest `1..n` or `0..n` ranges).

@@ -1,16 +1,29 @@
-Certainly! Let's first examine the differences between Grammar 1 and Grammar 2:
+Differences between Grammar 1 and Grammar 2 that affect the instance:
 
-1. **Modifiers to Validators:**
-   - In Grammar 2, the `Modifier` rule has been renamed to `Validator`.
-   - Methods now use `validators` instead of `modifiers`.
+1. **`Modifier` rule renamed and changed**
+   - Grammar 1: `Modifier: 'Modifier' ...`
+   - Grammar 2: `Validator: 'validator' ...`
+   - So:
+     - The keyword changes from **`'Modifier'`** to **`'validator'`**.
+     - The element type name changes from **Modifier** to **Validator**.
 
-2. **New Grammar Rules:**
-   - The `Validator` rule uses the keyword `validator` instead of `Modifier`.
-   - A new rule called `DataStore` has been added, but as per your instructions, I won't instantiate it in the instance since it is either optional or part of an "OR" relationship.
+2. **Contract body element list updated**
+   - Grammar 1 allows: `attributes | events | methods | modifiers`
+   - Grammar 2 allows: `attributes | events | methods | validators | dataStores`
+   - `dataStores` is new but optional (in the `*` list and also part of an `|`), so per your rule (2) **it must not be instantiated**.
 
-With these differences in mind, we can modify Instance 1 to create Instance 2. Here's how it would look:
+3. **Method references updated**
+   - Grammar 1 inside `Method`: `modifiers: ... modifiers+=[Modifier] ...`
+   - Grammar 2 inside `Method`: `validators: ... validators+=[Validator] ...`
+   - So the keyword changes from **`modifiers:`** to **`validators:`**, and references point to `Validator` elements.
 
-```plaintext
+Everything else used in Instance 1 remains compatible.
+
+---
+
+### Instance 2 (evolved to conform to Grammar 2)
+
+```txt
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -42,8 +55,3 @@ Contract SimpleContract {
 	}
 }
 ```
-
-Key Changes Made:
-
-- Replaced occurrences of `Modifier` with `validator`, both for declarations and references.
-- Replaced `modifiers` keyword with `validators` in the `method` definition.

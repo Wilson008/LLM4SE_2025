@@ -1,27 +1,3 @@
-To modify `Instance 1` so that it conforms to `Grammar 2`, let's first analyze the changes from `Grammar 1` to `Grammar 2`:
-
-1. **SQ_Encompass:**
-   - **Grammar 1:** Uses `SQ_EncompassBegin` and `SQ_EncompassEnd`.
-   - **Grammar 2:** Replaces it with a single `SQ_Encompass` construction that includes the element block and the end designation.
-
-2. **SQ_Skinparam:**
-   - **Grammar 1:** Contains four separate parameters (`colorval`, `numberval`, `idval`, `strval`).
-   - **Grammar 2:** Unifies these under `value=SQ_SkinparamValue`.
-
-3. **SQ_Color Definition:**
-   - **Grammar 1:** Has a terminal `COLOR`.
-   - **Grammar 2:** Introduces a non-terminal `SQ_Color` that encompasses both `HEXCOLOR` and a newly added `NAMEDCOLOR`.
-
-4. **PT_ParameterMap:**
-   - **Grammar 1:** Enclosed in `[]`.
-   - **Grammar 2:** Changes from `[]` to `{}`.
-
-5. **SQ_Description:**
-   - **Grammar 2:** Adds `...`, `==`, and `:` to potential elements.
-
-Let's now apply these changes to `Instance 1` to create `Instance 2`:
-
-```plaintext
 @startuml
 
 ' Configuration
@@ -54,6 +30,9 @@ box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
 ... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
 == Hier wirds kritisch ==
@@ -78,10 +57,3 @@ end
 [<-- Alice : Result 
 
 @enduml
-```
-
-Changes made:
-- **Encompass**: Replaced the `begin` and `end` syntax with the new `SQ_Encompass` block format.
-- **Color attributes**: Applied the `SQ_Color` definition for participants, lifelines, etc., which remains the same for this instance.
-- **Comment character sets, formatting, participants and flow**: Maintained unchanged per instruction except where indicated.
-- **`PT_ParameterMap`:** Changed square brackets `[]` to curly braces `{}` as specified for `Grammar 2`.

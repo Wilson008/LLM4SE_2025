@@ -1,21 +1,3 @@
-To create `instance_2` that conforms to `grammar_2`, let's first identify the differences between the two grammars and then modify `instance_1` accordingly. Here are the key differences:
-
-1. **Removal of `IsisEvent` from `IsisEntity`**: In `grammar_2`, `IsisEvents` are no longer allowed directly within `IsisEntity`. Instead, they are to be part of properties, collections, or actions.
-
-2. **Addition of `IsisCollection`**: A new concept of `collections` has been introduced to both `IsisEntity` and `IsisService`.
-
-3. **Changes in the structure of properties, collections, and actions**:
-   - Properties and collections can now have events.
-   - Actions have a new structure with a block enclosing parameters and features.
-   - `IsisActionParameters` now require an explicit `parameter` keyword and may include features.
-
-4. **IsisRepository**: The explicit `repository` syntax has been removed. Repositories must be defined as a service or collection now.
-
-5. **Addition of `IsisActionFeatureType` and `IsisCollectionFeatureType`**: These are new features explicitly defined in the grammar.
-
-Considering these changes, here's how `instance_1` can be modified into `instance_2` to conform to `grammar_2`:
-
-```plaintext
 package domainapp.dom.modules.simple
 
 import javax.jdo.annotations.Column
@@ -62,83 +44,41 @@ entity SimpleObject {
 	@Title(sequence="1")
 	@Property(editing = Editing.DISABLED)
 	property String name {
-		event UpdateNameDomainEvent
-	}
-
-	action updateName {
-		parameter String newName {
-			@Parameter(maxLength = 40)
-			@ParameterLayout(named = "New name")
-		}
 		body {
 			setName(newName)
 			this
 		}
 	}
 
-	action default0UpdateName {
+	event UpdateNameDomainEvent
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action Object updateName {
+		parameter @Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName
+		body {
+			setName(newName)
+			this
+		}
+	}
+
+	action Object default0UpdateName {
 		body {
 			getName()
 		}
 	}
 
-	action validateUpdateName {
+    	action Object validateUpdateName {
 		parameter String name
 		body {
-			if (name.contains("!"))
-				TranslatableString.tr("Exclamation mark is not allowed")
-			else
-				null
+	        	if (name.contains("!"))
+	        		TranslatableString.tr("Exclamation mark is not allowed")
+	        	else null
 		}
-	}
-
-	@DomainServiceLayout(menuOrder = "10")
-	collection SimpleObject {
-		action listAll {
-			@Action(semantics = SemanticsOf.SAFE)
-			@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-			@MemberOrder(sequence = "1")
-			body {
-				container.allInstances(SimpleObject)
-			}
-		}
-
-		action findByName {
-			@Action(semantics = SemanticsOf.SAFE)
-			@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-			@MemberOrder(sequence = "2")
-			parameter String name {
-				@ParameterLayout(named="Name")
-			}
-			body {
-				container.allMatches(new QueryDefault(SimpleObject,
-					"findByName", "name", name))
-			}
-		}
-
-		action create {
-			parameter String name {
-				@ParameterLayout(named="Name")
-			}
-			body {
-				val obj = container.newTransientInstance(SimpleObject)
-				obj.name = name
-				container.persistIfNotAlready(obj)
-				obj
-			}
-		}
-	}
+    	}
 
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
 	}
 
 }
-```
-
-### Key Modifications:
-
-- **Event Declaration**: Moved the `UpdateNameDomainEvent` inside the `property` for `name`.
-- **Action Structure**: Changed the structure of actions to include parameters and bodies explicitly.
-- **Action Parameters**: Added `parameter` keyword in `updateName`, `validateUpdateName`, `findByName`, and `create` methods.
-- **Collaboration of Collection and Repository**: Switched from explicit `repository` to `collection` for holding related actions and operations, in line with how collections may now include actions.

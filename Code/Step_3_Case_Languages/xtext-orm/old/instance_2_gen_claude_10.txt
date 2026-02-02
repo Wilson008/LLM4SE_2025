@@ -1,0 +1,97 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between grammar_1 and grammar_2, and create instance_2 accordingly.
+
+Main differences that affect the instance:
+1. Grammar_2 requires a 'Configuration' section at the beginning
+2. EntityField syntax changed to include directionality ('->') or ('<->')
+3. Options are now wrapped in a FieldDeclaration rule
+
+Following the rules you provided:
+1. I'll preserve single quotes
+2. For optional new elements (like bidirectional/unidirectional), I'll choose one option
+3. I'll maintain all formatting, including comments, whitespace, and empty lines
+
+Here's instance_2:
+
+```
+Configuration [
+]
+
+entity Club {
+	property name: String [unique, not_null]
+	
+	object [n..1|->] sportshall: SportsHall [not_null]
+	
+	object [1..n|->] teams: Team
+	object [1..n|->] roles: ClubRole
+	object [1..n|->] sessions: TrainingSession
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	property name: String [unique]
+	
+	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
+	
+	object [n..m|->] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	property first_name: String [not_null]
+	property last_name: String [not_null]
+	property position: Integer
+	
+	object [1..n|->] information: Information
+	object [1..n|->] roles: ClubRole
+	
+	object [n..1|->] team: Team
+	object [n..1|->] image: Image [not_null]
+}
+
+entity Image {
+	property path: String(200) [not_null]
+	property title: String [not_null]
+}
+
+entity Information {
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
+}
+
+entity SportsHall {
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m|->] images: Image
+}
+
+entity ClubRole {
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
+	backref [Player.roles] player
+}
+
+entity TrainingSession {
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
+}
+```
+
+The main changes made:
+1. Added empty Configuration section at the beginning
+2. Modified all EntityField declarations to include directionality (chose '->' as default)
+3. Maintained all existing formatting, comments, and options

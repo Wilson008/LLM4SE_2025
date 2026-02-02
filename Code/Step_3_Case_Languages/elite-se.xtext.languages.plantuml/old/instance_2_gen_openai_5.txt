@@ -1,0 +1,87 @@
+To modify `Instance 1` so that it conforms to `Grammar 2`, let's first analyze the changes from `Grammar 1` to `Grammar 2`:
+
+1. **SQ_Encompass:**
+   - **Grammar 1:** Uses `SQ_EncompassBegin` and `SQ_EncompassEnd`.
+   - **Grammar 2:** Replaces it with a single `SQ_Encompass` construction that includes the element block and the end designation.
+
+2. **SQ_Skinparam:**
+   - **Grammar 1:** Contains four separate parameters (`colorval`, `numberval`, `idval`, `strval`).
+   - **Grammar 2:** Unifies these under `value=SQ_SkinparamValue`.
+
+3. **SQ_Color Definition:**
+   - **Grammar 1:** Has a terminal `COLOR`.
+   - **Grammar 2:** Introduces a non-terminal `SQ_Color` that encompasses both `HEXCOLOR` and a newly added `NAMEDCOLOR`.
+
+4. **PT_ParameterMap:**
+   - **Grammar 1:** Enclosed in `[]`.
+   - **Grammar 2:** Changes from `[]` to `{}`.
+
+5. **SQ_Description:**
+   - **Grammar 2:** Adds `...`, `==`, and `:` to potential elements.
+
+Let's now apply these changes to `Instance 1` to create `Instance 2`:
+
+```plaintext
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+Changes made:
+- **Encompass**: Replaced the `begin` and `end` syntax with the new `SQ_Encompass` block format.
+- **Color attributes**: Applied the `SQ_Color` definition for participants, lifelines, etc., which remains the same for this instance.
+- **Comment character sets, formatting, participants and flow**: Maintained unchanged per instruction except where indicated.
+- **`PT_ParameterMap`:** Changed square brackets `[]` to curly braces `{}` as specified for `Grammar 2`.

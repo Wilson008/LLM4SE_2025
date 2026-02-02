@@ -1,0 +1,72 @@
+To create `instance_2` that conforms to `Grammar 2`, we need to address the changes made between `Grammar 1` and `Grammar 2`. Let's summarize the key differences between the two grammars and determine how to adapt `instance_1`:
+
+### Key Differences between Grammar 1 and Grammar 2:
+1. **MongoBean Declaration**: 
+   - In `Grammar 1`, `MongoBean` declarations start with the keyword `mongobean`.
+   - In `Grammar 2`, the explicit `mongobean` keyword is removed.
+
+2. **MongoProperty Type**:
+   - In `Grammar 1`, the `MongoProperty` type is strictly `JvmTypeReference`.
+   - In `Grammar 2`, the `MongoProperty` type can be either `JvmTypeReference` or an inline `MongoBean`.
+
+### Modifications for `instance_2`:
+- **Remove `mongobean` keyword**: Since `Grammar 2` no longer uses the `mongobean` keyword, we remove it from all bean declarations in `instance_1`.
+
+Keeping these adjustments in mind, here is the modified `instance_2`:
+
+```plaintext
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+This `instance_2` corresponds to the new `Grammar 2` rules and retains the original structure, comments, and formatting of `instance_1`.

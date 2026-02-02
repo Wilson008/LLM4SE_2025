@@ -1,0 +1,143 @@
+To transform `instance_1` into `instance_2` according to the changes from `grammar_1` to `grammar_2`, we need to account for several modifications:
+
+1. **Configuration Block**: `grammar_2` introduces a `Configuration` block in the `PersistenceModel` before defining entities. This includes Java and Python configuration options, but since these are optional, we will not include them in the instance.
+
+2. **Field Declaration Changes**: In `grammar_2`, fields can have options within a `FieldDeclaration`. Previously, options were directly associated with `PropertyField`, `EntityField`, and `BackrefField`.
+
+3. **Entity Field Changes**: `EntityField` now includes optional directionality (`bidirectional` or `unidirectional`), but these too are optional, as they're described with the `|` (OR) operator. Therefore, they will not be instantiated in `instance_2`.
+
+Given these observations, here is `instance_2`:
+
+```plaintext
+Configuration [
+
+]
+
+entity Club {
+	property name: String [unique, not_null]
+	[not_null]
+
+	object [n..1] sportshall: SportsHall
+	[not_null]
+
+	object [1..n] teams: Team
+
+	object [1..n] roles: ClubRole
+
+	object [1..n] sessions: TrainingSession
+
+}
+
+entity Team {
+	property numbering: Integer [not_null]
+	[not_null]
+
+	property name: String
+	[unique]
+
+	object [n..1] leader: Player // UseAlter when a cyclic dependency occurs
+
+	object [n..m] sessions: TrainingSession
+
+	backref [Club.teams] members
+	[not_null]
+
+	backref [Player.team] club
+
+}
+
+entity Player {
+	property public_id: String(100) [not_null, unique]
+	[not_null, unique]
+
+	property first_name: String
+	[not_null]
+
+	property last_name: String
+	[not_null]
+
+	property position: Integer
+
+	object [1..n] information: Information
+
+	object [1..n] roles: ClubRole
+
+	object [n..1] team: Team
+
+	object [n..1] image: Image
+	[not_null]
+
+}
+
+entity Image {
+	property path: String(200)
+	[not_null]
+
+	property title: String
+	[not_null]
+
+}
+
+entity Information {
+	property attribute: String
+	[not_null]
+
+	property val: String
+	[not_null]
+
+	backref [Player.information] player
+	[not_null]
+
+}
+
+entity SportsHall {
+	property street: String
+	[not_null]
+
+	property street_number: Integer
+	[not_null]
+
+	property zip_code: String
+	[not_null]
+
+	property place: String
+	[not_null]
+
+	property country: String
+	[not_null]
+
+	property state: String
+	[not_null]
+
+	object [n..m] images: Image
+
+}
+
+entity ClubRole {
+	property name: String
+	[not_null]
+
+	backref [Club.roles] club
+	[not_null]
+
+	backref [Player.roles] player
+
+}
+
+entity TrainingSession {
+	property day: Integer
+	[not_null]
+
+	property hour: Integer
+	[not_null]
+
+	property minute: Integer
+	[not_null]
+
+	backref [Club.sessions] club
+	[not_null]
+
+}
+```
+
+The above instance reflects the changes required to adapt from `grammar_1` to `grammar_2` while considering the optional directionality and configuration attributes mentioned in the grammar. All items are placed in the new field declaration format.

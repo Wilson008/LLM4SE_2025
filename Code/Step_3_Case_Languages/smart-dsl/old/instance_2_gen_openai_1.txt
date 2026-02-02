@@ -1,0 +1,50 @@
+To migrate `Instance 1` from `Grammar 1` to `Grammar 2`, we need to understand the changes made between the two grammars:
+
+1. **New Rule Added**: 
+   - `Validator` has been added, replacing `Modifier` in the method definition. However, this rule is in an "optional" position in the method definition, so it does not need immediate instantiation.
+   
+2. **Terminology Changes**:
+   - `Modifier` has been renamed to `Validator` in the method, but `Modifier` is still a separate entity in `Grammar 1` and `Validator` in `Grammar 2`.
+
+3. **New Rule Added**:
+   - `DataStore` was added to `Grammar 2` as an optional entity.
+
+Following these differences, here is `Instance 2`, based on `Instance 1` and updated according to `Grammar 2`:
+
+```plaintext
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+Key Points:
+- Replaced `Modifier` with `validator` to align with the name change in `Grammar 2`.
+- Reflect this change in the `method` rule as well, updating `modifiers` to `validators`.
+- We have not instantiated any optional new rules or attributes from `Grammar 2` (e.g., `dataStores`, `DataStore`), as per your instructions.

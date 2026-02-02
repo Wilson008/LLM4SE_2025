@@ -1,14 +1,8 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences and evolve instance_1 to instance_2 following your guidelines.
+Based on the differences between grammar_1 and grammar_2, here's the evolved instance that conforms to the second grammar:
 
-Main changes needed:
-1. "Modifier" keyword needs to change to "validator"
-2. "modifiers:" keyword needs to change to "validators:"
-3. The DataStore rule is new but optional (part of OR relationship in Contract rule), so we won't add it
-
-Here's instance_2 that conforms to grammar_2:
-
-        Contract SimpleContract {
+```
+Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
 	ownership
@@ -38,16 +32,11 @@ Here's instance_2 that conforms to grammar_2:
 		description: "Este evento es para notificar cuando el name se ha actualizado"
 	}
 }
+```
 
-The changes made are:
-1. Changed "Modifier" to "validator" in both declarations
-2. Changed "modifiers:" to "validators:" in the method declaration
+**Changes made:**
+1. `Modifier` keyword changed to `validator` (lines 6 and 11)
+2. `modifiers:` keyword changed to `validators:` in the method (line 16)
+3. The new `DataStore` rule was not instantiated as it's optional (in an OR relationship with other elements in the Contract rule)
 
-I maintained all formatting, including:
-- All white spaces
-- All indentations
-- All empty lines
-- All line breaks
-- All existing content structure
-
-I didn't add any DataStore instances since it's optional in grammar_2.
+All formatting, spacing, indentation, and comments have been preserved exactly as in the original instance.

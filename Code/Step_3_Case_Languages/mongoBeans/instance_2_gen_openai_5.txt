@@ -1,19 +1,23 @@
-To transform Instance 1 into Instance 2, which follows Grammar 2, let's first analyze the differences between Grammar 1 and Grammar 2:
+Differences between Grammar 1 and Grammar 2 that affect instances:
 
-1. **MongoBean Declaration**: 
-   - In Grammar 1, `MongoBean` was declared with the keyword `'mongobean'`.
-   - In Grammar 2, the keyword `'mongobean'` was removed. The `MongoBean` now just starts with the `name=ValidID`.
+1. **`MongoBean` header changed**
+   - **Grammar 1:** `mongobean` keyword is required:  
+     `MongoBean: 'mongobean' name=ValidID '{' ... '}' ;`
+   - **Grammar 2:** the `'mongobean'` keyword was removed:  
+     `MongoBean: name=ValidID '{' ... '}' ;`
+   - Impact: in the instance, every `mongobean X {` must become `X {`.
 
-2. **MongoProperty Changes**:
-   - In Grammar 1, the `MongoProperty` had a `type=JvmTypeReference`.
-   - In Grammar 2, `MongoProperty` can have either a `type=JvmTypeReference` or an `inlineType=MongoBean`. However, according to your instructions, we don't need to instantiate new optional or alternative attributes.
+2. **`MongoProperty` type extended (OR alternative added)**
+   - **Grammar 1:** only `type=JvmTypeReference`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean)` allowing inline bean types.
+   - Per your rule (2), since this is a new optional/OR capability, we **do not instantiate** the new `inlineType=MongoBean` form. So properties stay as they were (using normal `JvmTypeReference` types like `String`, `Album`, etc.).
 
-3. **No Other Major Structural Changes**:
-   - Other parts of the grammar remain unchanged, like package declaration, import, and operations.
+Everything else remains the same for this instance (imports, package, operations, bodies, comments, whitespace).
 
-With these changes in mind, let's modify Instance 1 to conform to Grammar 2, resulting in Instance 2:
+### Instance 2 (conforms to Grammar 2)
 
-```plaintext
+```
+// Instance 2
 import java.util.*
 
 package org.musicdb {
@@ -65,9 +69,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-### Key Modifications:
-
-- Removed the `'mongobean'` keyword before each bean definition.

@@ -1,0 +1,68 @@
+=== Step 3: Instance Transformation ===
+After analyzing the differences between grammar_1 and grammar_2, the main changes are:
+1. Removed 'mongobean' keyword from MongoBean rule
+2. Added an optional inline MongoBean type in MongoProperty rule with an "OR" relationship
+
+Following the rules:
+1. The only change needed is to remove the 'mongobean' keyword before each bean declaration
+2. We don't need to add any inline MongoBean types since it's in an "OR" relationship with the existing JvmTypeReference
+3. All formatting, comments, and other elements should remain exactly the same
+
+Here's instance_2 that conforms to grammar_2:
+
+```
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+} 
+```
+
+The only change made was removing all four occurrences of the 'mongobean' keyword while preserving all other elements exactly as they were in the original instance.

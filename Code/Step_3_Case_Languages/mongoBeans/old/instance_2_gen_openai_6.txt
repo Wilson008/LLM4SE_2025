@@ -1,0 +1,70 @@
+To create an instance of Grammar 2 from Instance 1, let's first identify the differences between Grammar 1 and Grammar 2 and see how these affect the instance.
+
+### Key Differences between Grammar 1 and Grammar 2:
+1. **`mongobean` Keyword Removed**: In Grammar 2, the `MongoBean` rule no longer includes the `mongobean` keyword; only the name is provided.
+2. **Inline MongoBean Types**: Grammar 2 allows for an inline definition of `MongoBean` in `MongoProperty` as `inlineType`, which could be used instead of `type`, but this is optional.
+
+Based on these differences, here's how Instance 1 should be transformed to create Instance 2, following the conventions and rules from Grammar 2:
+
+### Instance 2 (following Grammar 2):
+
+```plaintext
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+### Explanation:
+- The `mongobean` keyword has been removed from the definitions of `Artist`, `Album`, `Track`, and `Duration` to comply with the changes in Grammar 2. 
+- Since no other structural changes (like adding or omitting sections of code) are dictated by Grammar 2, the rest of the content remains unchanged. 
+
+This transformation ensures that the instance complies with the new grammar rules while maintaining its intended functionality and structure.

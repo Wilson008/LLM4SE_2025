@@ -1,0 +1,47 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences and modify instance_1 to conform to grammar_2. The main changes needed are:
+
+1. Convert hyphenated parameters to camelCase
+2. Remove 'type -> residual' in branch layer since BranchType was removed
+3. Rename 'operation' to 'eltwiseOperation' in branch layer
+4. Change 'final-layer' to 'finalLayer'
+5. Convert other hyphenated attributes in layers to camelCase
+
+Here's instance_2 that conforms to grammar_2:
+
+```
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+```
+
+I've maintained all formatting, including spaces, tabs, and line breaks, exactly as in the original instance. The only changes made are those necessary to conform to grammar_2's specifications.

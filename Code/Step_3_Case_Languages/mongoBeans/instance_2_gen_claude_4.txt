@@ -1,14 +1,15 @@
 === Step 3: Instance Transformation ===
-Looking at the differences between grammar_1 and grammar_2:
+Based on my analysis of the two grammars, here are the key differences:
 
-1. The 'mongobean' keyword is removed in grammar_2
-2. MongoProperty can now have either a JvmTypeReference or an inline MongoBean as type (using |)
+1. **MongoBean declaration**: The keyword `'mongobean'` is removed in grammar_2
+2. **MongoProperty**: Grammar_2 adds an alternative `inlineType=MongoBean` option (which is optional/OR relationship, so we should NOT instantiate it per your rule #2)
 
-Following the rules you provided:
-- For point 1: I need to remove all 'mongobean' keywords
-- For point 2: Since the inline MongoBean is in an "OR" relationship (|) with JvmTypeReference, I won't instantiate it
+Following your instructions, I need to:
+- Remove the `mongobean` keyword from all MongoBean declarations
+- Keep everything else identical (comments, formatting, whitespace, etc.)
+- Not use the new `inlineType` feature since it's an OR alternative
 
-Here's instance_2:
+Here's **instance_2**:
 
 ```
 import java.util.*
@@ -64,11 +65,3 @@ package org.musicdb {
 	}
 } 
 ```
-
-The only change made was removing the 'mongobean' keyword from each bean definition. All other aspects, including:
-- Comments
-- White spaces
-- Indentation
-- Empty lines
-- Other formatting
-remain exactly the same as in instance_1.

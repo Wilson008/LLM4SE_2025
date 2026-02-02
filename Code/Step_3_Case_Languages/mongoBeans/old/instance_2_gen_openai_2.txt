@@ -1,0 +1,65 @@
+To adapt Instance 1 to comply with Grammar 2, we first need to identify the differences between Grammar 1 and Grammar 2:
+
+1. **Removal of 'mongobean' Keyword**: In Grammar 2, the keyword 'mongobean' is removed from the `MongoBean` rule. A `MongoBean` is now simply declared by providing its name.
+
+2. **Change in `MongoProperty`**: Grammar 2 allows a `MongoBean` to be used as a type for `MongoProperty` through the optional use of `inlineType=MongoBean`. However, this is optional, so we will not use this feature in modifying the instance as per the instructions.
+
+Based on these differences, let's update Instance 1 to create Instance 2:
+
+```
+// No change in this part for imports and package
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist { // Removed 'mongobean' keyword
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album { // Removed 'mongobean' keyword
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track { // Removed 'mongobean' keyword
+		String title
+		Duration duration
+	}
+	
+	Duration { // Removed 'mongobean' keyword
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+In this transformation, the key change has been the removal of the 'mongobean' keyword. The rest of the structure, comments, and whitespace remain unchanged to ensure the adaptation respects both the new grammar rules and the format of the original instance.

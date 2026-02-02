@@ -1,18 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify the instance accordingly. Here are the key changes needed:
-
-1. Repository Changes:
-   - In grammar_2, repositories are removed, so the repository block needs to be restructured as actions in the main entity block
-
-2. Event Changes:
-   - In grammar_2, events are moved to be inside property and collection blocks
-   - The UpdateNameDomainEvent needs to be moved inside the 'name' property block
-
-3. Action Structure:
-   - In grammar_2, actions need to be enclosed in curly braces and use the 'body' feature
-   - Parameters need to be declared with 'parameter' keyword and can have their own block
-
-Here's the modified instance (instance_2):
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the migrated instance_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -66,21 +53,22 @@ entity SimpleObject {
 
 	@Action(domainEvent = UpdateNameDomainEvent)
 	action String updateName {
-		parameter @Parameter(maxLength = 40)
-            @ParameterLayout(named = "New name") String newName
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
 		}
 	}
 
-	action String default0UpdateName {
+	action Object default0UpdateName {
 		body {
 			getName()
 		}
 	}
 
-    	action String validateUpdateName {
+    	action Object validateUpdateName {
 		parameter String name
 		body {
         		if (name.contains("!"))
@@ -89,37 +77,6 @@ entity SimpleObject {
 		}
     	}
 
-	@Action(semantics = SemanticsOf.SAFE)
-    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "1")
-	action SimpleObject listAll {
-		body {
-			container.allInstances(SimpleObject)
-		}
-	}
-
-	@Action(semantics = SemanticsOf.SAFE)
-	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "2")
-	action SimpleObject findByName {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
-		}
-	}
-
-	@MemberOrder(sequence = "3")
-	action SimpleObject create {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
-		}
-	}
-
 	title {
 		TranslatableString.tr("Object: {name}", "name", name)
 	}
@@ -127,11 +84,11 @@ entity SimpleObject {
 }
 ```
 
-Key changes made:
-1. Moved UpdateNameDomainEvent inside the name property block
-2. Restructured all actions to use curly braces and 'body' feature
-3. Added explicit return types for actions
-4. Changed parameter declarations to use 'parameter' keyword
-5. Removed the repository block and moved its actions to the main entity block
-6. Preserved all formatting, comments, and annotations
-7. Maintained all single-quoted strings as they were in the original
+**Key changes made:**
+
+1. **Removed repository block** - `IsisRepository` was removed in grammar_2
+2. **Moved event inside property** - `event UpdateNameDomainEvent` is now inside the property block
+3. **Restructured actions** - Actions now use the new syntax with type before name and body inside braces
+4. **Changed parameters** - Parameters now use the `parameter` keyword and are declared inside the action body
+5. **Added body features** - Action logic is now wrapped in `body { }` blocks
+6. **Changed action signatures** - Format changed from `action name(params) { }` to `action Type name { parameter declarations... body { } }`

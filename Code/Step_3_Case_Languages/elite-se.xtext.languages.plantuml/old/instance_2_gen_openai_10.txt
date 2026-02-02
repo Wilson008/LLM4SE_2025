@@ -1,0 +1,80 @@
+To generate `instance_2` from `instance_1` based on the differences between `Grammar 1` and `Grammar 2`, we need to account for the following changes in the grammar:
+
+1. **SQ_Encompass and SQ_EncompassBegin/End:**
+   - `SQ_Encompass` has replaced `SQ_EncompassBegin` and `SQ_EncompassEnd`. We should adjust uses of `box` and `end box` accordingly.
+
+2. **SQ_Color Handling:**
+   - The `SQ_Color` rule now differentiates between `HEXCOLOR` and `NAMEDCOLOR`. The instance already uses hex colors, so no change is needed there.
+
+3. **PT_ParameterMap:**
+   - The syntax for `PT_ParameterMap` has changed from `[...]` to `{...}`. We will adjust the request and response parameters accordingly.
+
+These changes can be applied to `instance_1` to conform to `Grammar 2`:
+
+```plantuml
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+"return response(200||201, {event: "42"})"
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+end box
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+**Note:**
+- Since `SQ_EncompassBegin` and `SQ_EncompassEnd` have now become `SQ_Encompass`, this means we put sequence elements inside the scope of `box ... NEWLINE ... end box`.
+- `{...}` is now used instead of `[...]` for parameter maps in `request` and `response`.
+- All optional or "OR" relations are left uninstantiated, following your guidance to not include extra elements.

@@ -1,12 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 to conform to grammar_2 while following your guidelines. The main changes needed are:
-
-1. Events (`IsisEvent`) are now nested within properties, collections, or actions instead of being standalone
-2. Action syntax has changed to use block structure with '{}'
-3. Action return type is now specified before the name
-4. Repositories have been removed and need to be restructured as services
-
-Here's the modified instance (instance_2):
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the migrated instance_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -59,16 +52,65 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action SimpleObject updateName {
-		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+	action void updateName {
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
 		}
-		validate {
+	}
+
+	action void default0UpdateName {
+		body {
+			getName()
+		}
+	}
+
+    	action void validateUpdateName {
+		parameter String name
+        	body {
 			if (name.contains("!"))
-				TranslatableString.tr("Exclamation mark is not allowed")
-			else null
+        			TranslatableString.tr("Exclamation mark is not allowed")
+        		else null
+		}
+    	}
+
+	@DomainServiceLayout(menuOrder = "10")
+	service {
+
+    	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "1")
+		action void listAll {
+			body {
+				container.allInstances(SimpleObject)
+			}
+		}
+
+		@Action(semantics = SemanticsOf.SAFE)
+		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "2")
+		action void findByName {
+			@ParameterLayout(named="Name")
+			parameter String name
+			body {
+				container.allMatches(new QueryDefault(SimpleObject,
+					"findByName", "name", name))
+			}
+		}
+
+		@MemberOrder(sequence = "3")
+		action void create {
+			@ParameterLayout(named="Name")
+			parameter String name
+			body {
+				val obj = container.newTransientInstance(SimpleObject)
+				obj.name = name
+				container.persistIfNotAlready(obj)
+				obj
+			}
 		}
 	}
 
@@ -77,49 +119,13 @@ entity SimpleObject {
 	}
 
 }
-
-@DomainServiceLayout(menuOrder = "10")
-service SimpleObjectRepository {
-
-	@Action(semantics = SemanticsOf.SAFE)
-	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "1")
-	action List<SimpleObject> listAll {
-		body {
-			container.allInstances(SimpleObject)
-		}
-	}
-
-	@Action(semantics = SemanticsOf.SAFE)
-	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "2")
-	action List<SimpleObject> findByName {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
-		}
-	}
-
-	@MemberOrder(sequence = "3")
-	action SimpleObject create {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
-		}
-	}
-}
 ```
 
-Key changes made:
-1. Moved `UpdateNameDomainEvent` event inside the `name` property block
-2. Restructured actions to use block syntax with `body` and other features
-3. Converted repository section into a separate service
-4. Added return types to actions
-5. Restructured action parameters using the new `parameter` syntax
-6. Maintained all original formatting, comments, and whitespace
+**Key changes made:**
 
-I didn't add any optional new features from grammar_2 (like collections or additional features) as per your guidelines.
+1. **Event moved inside property**: `event UpdateNameDomainEvent` is now inside the property block
+2. **Repository changed to service**: The `repository` keyword changed to `service`
+3. **Actions restructured**: All actions now have the structure `action <type> <name> { ... }` with parameters and body inside
+4. **Parameters**: Changed from function-style `(param)` to block-style with `parameter` keyword
+5. **Action bodies**: Wrapped in `body { ... }` blocks
+6. **Return types**: Changed from optional to mandatory (using `void` where no return was specified)

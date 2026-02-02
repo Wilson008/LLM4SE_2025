@@ -1,0 +1,47 @@
+To create `instance_2` from `instance_1` based on the changes from `grammar_1` to `grammar_2`, let's first summarize the differences between the two grammars:
+
+1. **Modifications in Grammar:**
+   - The `Modifier` rule in `grammar_1` has been replaced with the `Validator` rule in `grammar_2`. The `"modifiers:"` keyword in `Method` has been changed to `"validators:"`, and `modifiers+=[Modifier]` is changed to `validators+=[Validator]`.
+   - A new rule `DataStore` is introduced in `grammar_2`, which we won't instantiate because it is optional.
+   - The structure and attributes of `Attribute`, `Method`, `Event`, etc., remained unchanged except for the changes to `Modifier`.
+
+2. **Migration Strategy:**
+   - Replace all instances of `Modifier` with `Validator`.
+   - Change the `"modifiers:"` keyword to `"validators:"` in `Method`.
+
+Now, let's apply these changes to `instance_1` to create `instance_2`, ensuring that formatting and comments remain intact:
+
+```plaintext
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+This `instance_2` now reflects the evolution from `grammar_1` to `grammar_2`, following the new rules and replacing references to `Modifier` with `Validator`.

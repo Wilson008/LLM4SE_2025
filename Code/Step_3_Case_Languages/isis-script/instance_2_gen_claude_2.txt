@@ -1,14 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 to create instance_2 that conforms to grammar_2. Here are the key changes needed:
-
-1. In grammar_2:
-- 'events' are moved inside properties, collections, and actions
-- Actions now require a block structure with '{}'
-- Action parameters are now defined with 'parameter' keyword and can have features
-- Repository concept is removed
-- Action return type is defined differently
-
-Based on these changes, here's instance_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -61,22 +52,23 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action SimpleObject updateName {
-		parameter @Parameter(maxLength = 40)
-            @ParameterLayout(named = "New name") String newName
+	action Void updateName {
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
 		}
 	}
 
-	action String default0UpdateName {
+	action Void default0UpdateName {
 		body {
 			getName()
 		}
 	}
 
-    	action TranslatableString validateUpdateName {
+    	action Void validateUpdateName {
 		parameter String name
 		body {
         		if (name.contains("!"))
@@ -92,12 +84,13 @@ entity SimpleObject {
 }
 ```
 
-Main changes made:
-1. Moved 'UpdateNameDomainEvent' event inside the name property block
-2. Restructured actions to use block syntax with 'body'
-3. Added 'parameter' keyword for action parameters
-4. Removed the repository section
-5. Added return types to actions explicitly
-6. Maintained all original formatting, comments, and whitespace
+**Key changes made:**
 
-Note that I didn't add any new optional elements from grammar_2 (like collections) and kept all the existing formatting intact.
+1. **Event moved into property body**: `event UpdateNameDomainEvent` is now inside the `property String name { }` block
+2. **Repository removed**: The entire `repository { }` block has been removed since grammar_2 removed repositories from IsisEntity
+3. **Action syntax changed**: All actions now use the new syntax with:
+   - Mandatory return type (using `Void` where no return type was specified)
+   - Block structure with `{ }` instead of `( )` for parameters
+   - `parameter` keyword for each parameter
+   - `body { }` block for the action expression
+4. **Action parameters**: Changed from inline parameters to separate `parameter` declarations within the action block

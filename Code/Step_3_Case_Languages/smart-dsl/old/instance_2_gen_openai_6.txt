@@ -1,0 +1,44 @@
+To modify `instance_1` into `instance_2`, we need to look at the differences between `grammar_1` and `grammar_2`:
+
+1. **Introduction of `Validator`**: In `grammar_2`, the `Modifier` has been replaced with `Validator`. This involves changing the keyword `Modifier` to `validator`.
+
+2. **Renaming and Update in `Method`**: In `grammar_2`, the keyword `modifiers:` in `Method` has been changed to `validators:`. The reference to `Modifier` now points to `Validator`.
+
+3. **Addition of `DataStore`**: The updated grammar introduces `DataStore`. However, since it is not mandatory and we follow point 2 above, we won't add it to `instance_2`.
+
+With these differences in mind, here is `instance_2`:
+
+```
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+This instance has been updated to use `validator` instead of `Modifier` and `validators:` instead of `modifiers:` in the `method`.

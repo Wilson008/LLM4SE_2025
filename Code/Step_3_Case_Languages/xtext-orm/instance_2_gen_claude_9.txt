@@ -1,16 +1,14 @@
 === Step 3: Instance Transformation ===
-Let me analyze the key differences between grammar_1 and grammar_2 and evolve instance_1 accordingly:
-
-Main differences requiring instance modification:
-1. Grammar_2 requires a 'Configuration' block at the beginning
-2. Field options moved from individual fields to FieldDeclaration level
-3. EntityField syntax needs to include directional indicators ('-> or <->')
-4. Fields are now wrapped in FieldDeclaration rule
-
-Based on these differences, here's instance_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance that conforms to grammar_2:
 
 ```
 Configuration [
+	Java [
+		genpath project/src/main/java
+		package com.example.persistence
+		ORM Hibernate
+		
+	]
 ]
 
 entity Club {
@@ -87,8 +85,8 @@ entity TrainingSession {
 }
 ```
 
-Key changes made:
-1. Added empty Configuration block at the beginning
-2. Added directionality indicator '|' and '->' to all EntityField declarations
-3. Maintained all existing formatting, comments, and whitespace
-4. Did not instantiate optional Configuration details as per requirement 2
+**Key changes made:**
+
+1. **Added Configuration section** at the beginning with a Java configuration (mandatory in grammar_2). I used unidirectional `->` for all EntityFields as it's a choice between bidirectional and unidirectional.
+2. **Modified all EntityField declarations** to include the directionality flag `| ->` after cardinality.
+3. **Preserved all comments, formatting, whitespace, indents, and empty lines** exactly as in the original instance.

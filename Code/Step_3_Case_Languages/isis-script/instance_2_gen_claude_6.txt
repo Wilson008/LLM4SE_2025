@@ -1,17 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences and modify the instance according to the rules you provided. The main changes needed are:
-
-1. Action Structure Change:
-- In grammar_2, actions need to be wrapped in curly braces and have explicit 'body' features
-- Parameters need to be defined with 'parameter' keyword and can have their own block
-
-2. Repository Removal:
-- The repository section needs to be removed as it's no longer supported in grammar_2
-
-3. Events Movement:
-- Events need to be moved inside property blocks
-
-Here's the modified instance (instance_2) that conforms to grammar_2:
+Based on the differences between grammar_1 and grammar_2, here's the migrated instance_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -64,21 +52,23 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action String updateName {
-		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+	action SimpleObject updateName {
+		@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name")
+		parameter String newName
 		body {
 			setName(newName)
 			this
 		}
 	}
 
-	action String default0UpdateName {
+	action Object default0UpdateName {
 		body {
 			getName()
 		}
 	}
 
-    	action String validateUpdateName {
+    	action Object validateUpdateName {
 		parameter String name
 		body {
         		if (name.contains("!"))
@@ -94,10 +84,12 @@ entity SimpleObject {
 }
 ```
 
-Key changes made:
-1. Moved 'UpdateNameDomainEvent' event inside the name property block
-2. Restructured actions to use body blocks
-3. Added explicit parameter declarations with 'parameter' keyword
-4. Removed the repository section
-5. Maintained all original formatting, comments, and whitespace
-6. Did not add any new optional features from grammar_2
+**Key changes made:**
+
+1. **Removed repository block** - `IsisRepository` no longer exists in grammar_2
+2. **Moved event inside property** - `event UpdateNameDomainEvent` is now inside the `property String name { }` block
+3. **Restructured actions** - Changed from inline parameter list `(params)` to feature block `{ }` format with:
+   - Explicit return type (e.g., `SimpleObject`, `Object`)
+   - `parameter` declarations inside the block
+   - `body { }` block for the action implementation
+4. **Action parameters** - Now use `parameter` keyword with type and optional feature blocks for annotations

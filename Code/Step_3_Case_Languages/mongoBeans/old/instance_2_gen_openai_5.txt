@@ -1,0 +1,73 @@
+To transform Instance 1 into Instance 2, which follows Grammar 2, let's first analyze the differences between Grammar 1 and Grammar 2:
+
+1. **MongoBean Declaration**: 
+   - In Grammar 1, `MongoBean` was declared with the keyword `'mongobean'`.
+   - In Grammar 2, the keyword `'mongobean'` was removed. The `MongoBean` now just starts with the `name=ValidID`.
+
+2. **MongoProperty Changes**:
+   - In Grammar 1, the `MongoProperty` had a `type=JvmTypeReference`.
+   - In Grammar 2, `MongoProperty` can have either a `type=JvmTypeReference` or an `inlineType=MongoBean`. However, according to your instructions, we don't need to instantiate new optional or alternative attributes.
+
+3. **No Other Major Structural Changes**:
+   - Other parts of the grammar remain unchanged, like package declaration, import, and operations.
+
+With these changes in mind, let's modify Instance 1 to conform to Grammar 2, resulting in Instance 2:
+
+```plaintext
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+}
+```
+
+### Key Modifications:
+
+- Removed the `'mongobean'` keyword before each bean definition.

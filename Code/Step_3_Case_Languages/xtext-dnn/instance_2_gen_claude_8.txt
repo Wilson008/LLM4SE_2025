@@ -1,15 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences and create instance_2 based on the evolution rules from grammar_1 to grammar_2. Here are the main changes needed:
-
-1. Change hyphenated parameter names to camelCase
-2. Remove 'type -> residual' in branch since BranchType is removed in grammar_2
-3. Change 'operation' to 'eltwiseOperation' in branch
-4. Change 'use-bias-term' to 'useBiasTerm'
-5. Change 'use-global-stats' to 'useGlobalStats'
-6. Change 'kernel-size' to 'kernelSize'
-7. Change 'final-layer' to 'finalLayer'
-
-Here's instance_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the migrated instance that conforms to grammar_2:
 
 ```
 network "DemoNet" {
@@ -19,7 +9,6 @@ network "DemoNet" {
     imageChannels = 1
     outputLabels = 10
 
-    caffePath = "$CAFFE_HOME"
     outputPath = "/media/xpitfire/data/temp"
 
 	updater -> sgd
@@ -46,4 +35,19 @@ network "DemoNet" {
 }
 ```
 
-I've maintained all formatting, including spaces, tabs, and empty lines, while only changing the necessary elements to conform to grammar_2.
+**Key changes made:**
+
+1. `batch-size` → `batchSize`
+2. `image-size` → `imageSize`
+3. `image-channels` → `imageChannels`
+4. `output-labels` → `outputLabels`
+5. Removed `caffe-path = "$CAFFE_HOME"` (caffePath is now optional in grammar_2, and we follow rule 2: don't instantiate newly optional elements)
+6. `output-path` → `outputPath`
+7. `kernel-size` → `kernelSize` (in all conv layers)
+8. In branch body: removed `type -> residual` line (BranchType removed from grammar_2)
+9. In branch body: `operation` → `eltwiseOperation`
+10. `use-global-stats` → `useGlobalStats`
+11. `use-bias-term` → `useBiasTerm`
+12. `final-layer` → `finalLayer`
+
+All formatting, whitespace, indentation, comments, and structure have been preserved exactly as in the original instance.

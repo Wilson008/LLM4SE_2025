@@ -1,16 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences and evolve instance_1 to instance_2 following the rules you specified.
-
-The main changes needed are:
-1. Change kebab-case to camelCase in parameter names
-2. Remove 'type -> residual' in branch since BranchType is removed
-3. Change 'operation' to 'eltwiseOperation' in branch
-4. Change 'use-bias-term' to 'useBiasTerm'
-5. Change 'use-global-stats' to 'useGlobalStats'
-6. Change 'final-layer' to 'finalLayer'
-7. Change other kebab-case parameter names accordingly
-
-Here's instance_2 that conforms to grammar_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, here's the migrated instance_2 that conforms to grammar_2:
 
 ```
 network "DemoNet" {
@@ -47,4 +36,12 @@ network "DemoNet" {
 }
 ```
 
-I've maintained all formatting, including white spaces, indents, and empty lines, while only changing the necessary elements to conform to grammar_2.
+**Changes applied:**
+1. Network attributes: `batch-size` → `batchSize`, `image-size` → `imageSize`, `image-channels` → `imageChannels`, `output-labels` → `outputLabels`, `caffe-path` → `caffePath`, `output-path` → `outputPath`
+2. Conv layer: `kernel-size` → `kernelSize`
+3. Branch body: `operation` → `eltwiseOperation`, removed `type -> residual` line
+4. Norm body: `use-global-stats` → `useGlobalStats`
+5. Scale body: `use-bias-term` → `useBiasTerm`
+6. Final layer name: `final-layer` → `finalLayer`
+
+All formatting, whitespace, indentation, and comments have been preserved exactly as in the original instance.

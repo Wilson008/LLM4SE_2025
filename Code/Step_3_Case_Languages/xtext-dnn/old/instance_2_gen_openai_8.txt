@@ -1,0 +1,57 @@
+To create an updated instance (Instance 2) that conforms to Grammar 2, let's first identify the differences between Grammar 1 and Grammar 2:
+
+1. **Changes to Attribute Names:**
+   - `image-size` has been changed to `imageSize`.
+   - `image-channels` has been changed to `imageChannels`.
+   - `batch-size` has been changed to `batchSize`.
+   - `output-labels` has been changed to `outputLabels`.
+   - `train-data-path` has been changed to `trainDataPath`.
+   - `val-data-path` has been changed to `valDataPath`.
+   - `caffe-path` has been changed to `caffePath`.
+   - `output-path` has been changed to `outputPath`.
+
+2. **BranchBody Changes:**
+   - `type` attribute is removed from `BranchBody`.
+   - `operation` is replaced with `eltwiseOperation`.
+
+3. **Use of Single Quotes:**
+   - The grammar requires all attribute keys to be enclosed in single quotes.
+
+Now, let's modify Instance 1 to create Instance 2 based on these changes:
+
+```plaintext
+network "DemoNet" {
+	'epochs' = 10
+	'batchSize' = 50
+	'imageSize' = 28
+    'imageChannels' = 1
+    'outputLabels' = 10
+
+    'caffePath' = "$CAFFE_HOME"
+    'outputPath' = "/media/xpitfire/data/temp"
+
+	'updater' -> sgd
+	'learningRate' = 0.003
+
+	conv   (name: "c1" in:data out:64)     { 'kernelSize' = 6 }
+    conv   (name: "c2" 		   out:32)     { 'kernelSize' = 3 }
+	conv   (name: "c3"         out:32)     { 'kernelSize' = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		'eltwiseOperation' -> PROD
+
+		conv (name: "bc1"      out:32)     { 'kernelSize' = 1 }
+		norm (name: "bn1")				   { 'useGlobalStats' = true }
+		scale(name: "bs1") 				   { 'useBiasTerm' = true }
+	}
+
+	pool   (name: "p1"         out:3)      { 'type' -> MAX, 'stride' = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: final-layer  out:labels)
+}
+```
+
+In this updated instance (Instance 2), all the attribute keys have been changed according to Grammar 2, and those that were required to be wrapped in single quotes have been updated accordingly. Optional or alternate grammar changes have not been instantiated as per the instructions.

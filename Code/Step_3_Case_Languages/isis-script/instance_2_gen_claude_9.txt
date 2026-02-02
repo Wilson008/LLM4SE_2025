@@ -1,18 +1,5 @@
 === Step 3: Instance Transformation ===
-I'll analyze the differences between the grammars and modify instance_1 accordingly to create instance_2 that conforms to grammar_2. Here are the key changes needed:
-
-1. Repository Changes:
-- In grammar_2, 'repository' construct is removed, so we need to remove the repository block or transform it into a different structure.
-
-2. Action Structure Changes:
-- Actions in grammar_2 require a block structure with '{' and '}'
-- Action parameters are now defined with 'parameter' keyword
-- Action features need to be properly categorized (body, hide, disable, validate)
-
-3. Events Location:
-- Events are now nested within properties, collections, or actions
-
-Based on these changes, here's how instance_1 should be modified:
+Looking at the differences between the two grammars and the instance, here's the migrated instance that conforms to grammar_2:
 
 ```
 package domainapp.dom.modules.simple
@@ -65,48 +52,62 @@ entity SimpleObject {
 	}
 
 	@Action(domainEvent = UpdateNameDomainEvent)
-	action String updateName {
-		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+	action void updateName {
+		parameter @Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName
 		body {
 			setName(newName)
 			this
 		}
-		validate {
-			if (name.contains("!"))
-				TranslatableString.tr("Exclamation mark is not allowed")
-			else null
+	}
+
+	action void default0UpdateName {
+		body {
+			getName()
 		}
 	}
+
+    	action void validateUpdateName {
+		parameter String name
+        	body {
+			if (name.contains("!"))
+        			TranslatableString.tr("Exclamation mark is not allowed")
+        		else null
+		}
+    	}
 
 	@DomainServiceLayout(menuOrder = "10")
-	@Action(semantics = SemanticsOf.SAFE)
-	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "1")
-	action SimpleObject listAll {
-		body {
-			container.allInstances(SimpleObject)
-		}
-	}
+	service repository {
 
-	@Action(semantics = SemanticsOf.SAFE)
-	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
-	@MemberOrder(sequence = "2")
-	action SimpleObject findByName {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			container.allMatches(new QueryDefault(SimpleObject,
-				"findByName", "name", name))
+    	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "1")
+		action void listAll {
+			body {
+				container.allInstances(SimpleObject)
+			}
 		}
-	}
 
-	@MemberOrder(sequence = "3")
-	action SimpleObject create {
-		parameter @ParameterLayout(named="Name") String name
-		body {
-			val obj = container.newTransientInstance(SimpleObject)
-			obj.name = name
-			container.persistIfNotAlready(obj)
-			obj
+		@Action(semantics = SemanticsOf.SAFE)
+		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "2")
+		action void findByName {
+			parameter @ParameterLayout(named="Name") String name
+			body {
+				container.allMatches(new QueryDefault(SimpleObject,
+					"findByName", "name", name))
+			}
+		}
+
+		@MemberOrder(sequence = "3")
+		action void create {
+			parameter @ParameterLayout(named="Name") String name
+			body {
+				val obj = container.newTransientInstance(SimpleObject)
+				obj.name = name
+				container.persistIfNotAlready(obj)
+				obj
+			}
 		}
 	}
 
@@ -117,11 +118,13 @@ entity SimpleObject {
 }
 ```
 
-Key modifications made:
-1. Moved the UpdateNameDomainEvent event inside the property block
-2. Restructured all actions to use block syntax with 'body' and other features
-3. Converted action parameters to use 'parameter' keyword
-4. Removed the repository block and moved its actions to the entity level
-5. Maintained all original formatting, comments, and whitespace
-6. Preserved all annotations and imports
-7. Added return types for actions as required by grammar_2
+**Key changes made:**
+
+1. **Property `name`**: Moved `event UpdateNameDomainEvent` inside the property body block (grammar_2 allows events within properties)
+
+2. **Repository**: Changed from `repository {` to `service repository {` (grammar_2 removed IsisRepository from entities; repositories are now services)
+
+3. **All actions**: Restructured to use the new action syntax with mandatory type and body structure:
+   - Added mandatory return type (using `void` where appropriate)
+   - Changed from `action name(params) { expression }` to `action type name { parameter ... body { expression } }`
+   - Parameters moved inside action body using `parameter` keyword

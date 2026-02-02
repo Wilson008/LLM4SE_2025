@@ -1,38 +1,33 @@
 === Step 3: Instance Transformation ===
-Looking at the differences between grammar_1 and grammar_2, the main changes required for the instance are:
-
-1. Add a mandatory 'Configuration' section at the beginning (since it's mandatory in grammar_2)
-2. In EntityField declarations, modify the cardinality syntax to include a directional indicator (either '<->' or '->')
-3. Separate the options into a new FieldDeclaration structure (though this doesn't affect the concrete syntax)
-
-Here's instance_2 conforming to grammar_2:
+Based on the differences between grammar_1 and grammar_2, here's instance_2 that conforms to grammar_2:
 
 ```
 Configuration [
 	Java [
 		genpath src/main/java
-		package de.model
+		package com.example.persistence
 		ORM Hibernate
+		
 	]
 ]
 
 entity Club {
 	property name: String [unique, not_null]
 	
-	object [n..1|->] sportshall: SportsHall [not_null]
+	object [n..1 | ->] sportshall: SportsHall [not_null]
 	
-	object [1..n|->] teams: Team
-	object [1..n|->] roles: ClubRole
-	object [1..n|->] sessions: TrainingSession
+	object [1..n | ->] teams: Team
+	object [1..n | ->] roles: ClubRole
+	object [1..n | ->] sessions: TrainingSession
 }
 
 entity Team {
 	property numbering: Integer [not_null]
 	property name: String [unique]
 	
-	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
+	object [n..1 | ->] leader: Player // UseAlter when a cyclic dependency occurs
 	
-	object [n..m|->] sessions: TrainingSession
+	object [n..m | ->] sessions: TrainingSession
 	
 	backref [Club.teams] club [not_null]
 	backref [Player.team] members
@@ -44,11 +39,11 @@ entity Player {
 	property last_name: String [not_null]
 	property position: Integer
 	
-	object [1..n|->] information: Information
-	object [1..n|->] roles: ClubRole
+	object [1..n | ->] information: Information
+	object [1..n | ->] roles: ClubRole
 	
-	object [n..1|->] team: Team
-	object [n..1|->] image: Image [not_null]
+	object [n..1 | ->] team: Team
+	object [n..1 | ->] image: Image [not_null]
 }
 
 entity Image {
@@ -71,7 +66,7 @@ entity SportsHall {
 	property country: String [not_null]
 	property state: String [not_null]
 	
-	object [n..m|->] images: Image
+	object [n..m | ->] images: Image
 }
 
 entity ClubRole {
@@ -90,9 +85,10 @@ entity TrainingSession {
 }
 ```
 
-The main changes made were:
-1. Added a Configuration section at the start
-2. Modified all 'object' declarations to include the directional indicator '|->'
-3. Maintained all existing formatting, comments, and whitespace
-4. Used unidirectional relationships ('->') as the default choice
-5. Chose Java Configuration as an example configuration (since we need at least one)
+**Key changes made:**
+
+1. **Added Configuration section** at the beginning with a Java configuration (mandatory in grammar_2). I chose Java over Python since it's an "OR" relationship, and used unidirectional `->` for EntityFields since bidirectional vs unidirectional is also an "OR" relationship.
+
+2. **Modified all EntityField declarations** to include the directionality indicator (`| ->`) after the cardinality, as required by the new EntityField syntax in grammar_2.
+
+3. **Preserved all formatting**: comments, whitespace, indents, tabs, and empty lines remain exactly as in the original instance.

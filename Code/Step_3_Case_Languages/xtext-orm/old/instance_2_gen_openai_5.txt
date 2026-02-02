@@ -1,0 +1,132 @@
+To convert `instance_1` from `Grammar 1` to `Grammar 2`, we need to identify the changes made in the grammar and adjust the instance accordingly. Here's a summary of the changes from `Grammar 1` to `Grammar 2`, and then I'll provide the modified instance `instance_2`.
+
+### Key Differences in Grammar:
+1. **Configuration Section**: `Grammar 2` introduces a `Configuration` section at the beginning of the `PersistenceModel`.
+2. **FieldDeclaration Structure**: `Grammar 2` changes how options are attached to fields. In `Grammar 2`, options are part of a separate `FieldDeclaration` rule, not directly within `PropertyField` or `EntityField`.
+3. **EntityField**: Adds a direction between entities (bidirectional `<->` or unidirectional `->`) in entity fields but doesn't require it to be instantiated per instruction.
+4. **TypeOption on BackrefField**: The attachment of options to `BackrefField` appears not explicitly allowed in `Grammar 2`.
+
+Based on these changes, here's `Instance_2` following `Grammar 2`:
+
+```plaintext
+Configuration [
+    // If needed, configuration details can go here, but we're not instantiating them.
+]
+
+entity Club {
+    property name: String [unique, not_null]
+    
+    object [n..1 |] sportshall: SportsHall
+    [not_null]
+    
+    object [1..n |] teams: Team
+    
+    object [1..n |] roles: ClubRole
+    
+    object [1..n |] sessions: TrainingSession
+}
+
+entity Team {
+    property numbering: Integer
+    [not_null]
+    
+    property name: String
+    [unique]
+    
+    object [n..1 |] leader: Player // UseAlter when a cyclic dependency occurs
+    
+    object [n..m |] sessions: TrainingSession
+    
+    backref [Club.teams] members
+}
+
+entity Player {
+    property public_id: String(100)
+    [not_null, unique]
+    
+    property first_name: String
+    [not_null]
+    
+    property last_name: String
+    [not_null]
+    
+    property position: Integer
+    
+    object [1..n |] information: Information
+    
+    object [1..n |] roles: ClubRole
+    
+    object [n..1 |] team: Team
+    
+    object [n..1 |] image: Image
+    [not_null]
+}
+
+entity Image {
+    property path: String(200)
+    [not_null]
+    
+    property title: String
+    [not_null]
+}
+
+entity Information {
+    property attribute: String
+    [not_null]
+    
+    property val: String
+    [not_null]
+    
+    backref [Player.information] player
+}
+
+entity SportsHall {
+    property street: String
+    [not_null]
+    
+    property street_number: Integer
+    [not_null]
+    
+    property zip_code: String
+    [not_null]
+    
+    property place: String
+    [not_null]
+    
+    property country: String
+    [not_null]
+    
+    property state: String
+    [not_null]
+    
+    object [n..m |] images: Image
+}
+
+entity ClubRole {
+    property name: String
+    [not_null]
+    
+    backref [Club.roles] club
+    
+    backref [Player.roles] player
+}
+
+entity TrainingSession {
+    property day: Integer
+    [not_null]
+    
+    property hour: Integer
+    [not_null]
+    
+    property minute: Integer
+    [not_null]
+    
+    backref [Club.sessions] club
+    [not_null]
+}
+```
+
+**Note**: 
+1. Fields' end declaration with options (`[unique, not_null]`) are moved based on the new structure. 
+2. The direction of fields using `|` in `EntityField` is added as a structure but not detailed due to instructions.
+3. Configuration is recognized but left empty as specifics were not given or mandatorily instantiated.

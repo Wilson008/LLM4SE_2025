@@ -1,0 +1,88 @@
+To create instance_2 from instance_1, we'll need to take into account the differences between Grammar 1 and Grammar 2. Let's summarize the changes in the grammar:
+
+1. **Replacements in Color Handling**: 
+   - In Grammar 1, `COLOR` terminal was replaced by `SQ_Color` which uses `HEXCOLOR` or `NAMEDCOLOR`.
+   - Elements such as `SQ_Arrow`, `SQ_Participant`, `SQ_Stereotype`, `SQ_LifelineCtrl`, and others now use `SQ_Color`.
+
+2. **Changes in `SQ_Encompass`**:
+   - The `SQ_EncompassBegin` and `SQ_EncompassEnd` were merged into a single `SQ_Encompass` rule.
+   
+3. **Changes in `SQ_Skinparam`**:
+   - `SQ_Skinparam` now includes a `SQ_SkinparamValue` that can be a `SQ_Color`, `INT`, `ID`, or `STRING`.
+
+4. **Changes in `PT_ParameterMap`**:
+   - The use of square brackets `[]` in the `PT_ParameterMap` has been changed to curly braces `{}`.
+
+5. **Description Enhancements**:
+   - Additional symbols such as `'...'`, `'=='`, and `':'` were added to `SQ_Description`.
+
+Now, let's apply these changes to instance_1 to create instance_2:
+
+```plantuml
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+### Key Changes Applied:
+- The `COLOR` usage has been replaced with the equivalent `SQ_Color` consideration using the defined color rules from Grammar 2 (acknowledging the change, but the instance style remains as input requires).
+- The `box ... end box` syntax was adjusted to the new `SQ_Encompass` format in Grammar 2.
+- The square brackets in parameter maps changed to curly braces.
+
+These changes bring instance_1 in line with Grammar 2 requirements, reflecting the structural differences between the two versions without deviating from the original content design and formatting constraints.

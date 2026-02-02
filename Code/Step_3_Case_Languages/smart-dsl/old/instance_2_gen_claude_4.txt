@@ -1,0 +1,46 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between the grammars and modify instance_1 to create instance_2 that conforms to grammar_2.
+
+Main differences between grammars:
+1. "Modifier" keyword changed to "validator"
+2. "modifiers" reference changed to "validators" in Method rule
+3. Added DataStore rule (optional, so won't instantiate)
+
+Here's instance_2 following grammar_2, maintaining the exact same formatting:
+
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+
+Changes made:
+1. Changed "Modifier" to "validator" in the declarations
+2. Changed "modifiers:" to "validators:" in the method declaration
+3. Maintained all formatting, including white spaces, indentation, and empty lines
+4. Did not add any DataStore instances as they are optional in grammar_2

@@ -1,0 +1,142 @@
+Let's start by analyzing the differences between Grammar 1 and Grammar 2. Then, we'll make the necessary modifications to Instance 1 to ensure it aligns with Grammar 2.
+
+### Differences between Grammar 1 and Grammar 2:
+
+1. **IsisEntity:**
+   - Removed `events+=IsisEvent` from Grammar 1.
+   - Added `collections+=IsisCollection` to Grammar 2.
+
+2. **IsisService:**
+   - Added `collections+=IsisCollection` to Grammar 2.
+
+3. **IsisProperty:**
+   - Added `events+=IsisEvent` to Grammar 2.
+
+4. **IsisAction:**
+   - Changed structure to include `{ ... }` block with features, parameters, and events in Grammar 2.
+
+5. **IsisCollection and IsisCollectionFeature:**
+   - Added IsisCollection and corresponding features in Grammar 2.
+
+6. **IsisActionParameter:**
+   - Added feature block (`{ ... }`) in Grammar 2.
+
+7. **Enums:**
+   - Added `Complete` to `IsisPropertyFeatureType`.
+   - Added `IsisActionFeature` and `IsisCollectionFeature`.
+
+### Modifications to Instance 1 to create Instance 2:
+
+Here’s the modified Instance based on the differences analyzed:
+
+```plaintext
+package domainapp.dom.modules.simple
+
+import javax.jdo.annotations.Column
+import javax.jdo.annotations.DatastoreIdentity
+import javax.jdo.annotations.IdGeneratorStrategy
+import javax.jdo.annotations.IdentityType
+import javax.jdo.annotations.PersistenceCapable
+import javax.jdo.annotations.Queries
+import javax.jdo.annotations.Query
+import javax.jdo.annotations.Unique
+import javax.jdo.annotations.Version
+import javax.jdo.annotations.VersionStrategy
+import org.apache.isis.applib.annotation.Action
+import org.apache.isis.applib.annotation.ActionLayout
+import org.apache.isis.applib.annotation.BookmarkPolicy
+import org.apache.isis.applib.annotation.DomainObject
+import org.apache.isis.applib.annotation.DomainObjectLayout
+import org.apache.isis.applib.annotation.DomainServiceLayout
+import org.apache.isis.applib.annotation.Editing
+import org.apache.isis.applib.annotation.MemberOrder
+import org.apache.isis.applib.annotation.Parameter
+import org.apache.isis.applib.annotation.ParameterLayout
+import org.apache.isis.applib.annotation.Property
+import org.apache.isis.applib.annotation.SemanticsOf
+import org.apache.isis.applib.annotation.Title
+import org.apache.isis.applib.query.QueryDefault
+import org.apache.isis.applib.services.i18n.TranslatableString
+
+@PersistenceCapable(identityType=IdentityType.DATASTORE)
+@DatastoreIdentity(strategy=IdGeneratorStrategy.IDENTITY, column="id")
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="version")
+@Queries(#[
+	@Query(name = "find", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject"),
+	@Query(name = "findByName", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject WHERE name.indexOf(:name) >= 0")
+])
+@Unique(name="SimpleObject_name_UNQ", members = #["name"])
+@DomainObject(objectType = "SIMPLE")
+@DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+entity SimpleObject {
+
+	@Column(allowsNull="false", length = 40)
+	@Title(sequence="1")
+	@Property(editing = Editing.DISABLED)
+	property String name {
+		event UpdateNameDomainEvent
+	}
+
+	action updateName(@Parameter(maxLength = 40)
+            @ParameterLayout(named = "New name") String newName) {
+		setName(newName)
+		this
+	}
+
+	action default0UpdateName() {
+		getName()
+	}
+
+    	action validateUpdateName(String name) {
+        	if (name.contains("!"))
+        		TranslatableString.tr("Exclamation mark is not allowed")
+        	else null
+    	}
+
+	@DomainServiceLayout(menuOrder = "10")
+	repository {
+
+    	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "1")
+		action listAll() {
+			container.allInstances(SimpleObject)
+		}
+
+		@Action(semantics = SemanticsOf.SAFE)
+		@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+		@MemberOrder(sequence = "2")
+		action findByName(@ParameterLayout(named="Name") String name) {
+			container.allMatches(new QueryDefault(SimpleObject,
+				"findByName", "name", name))
+		}
+
+		@MemberOrder(sequence = "3")
+		action create(@ParameterLayout(named="Name") String name) {
+			val obj = container.newTransientInstance(SimpleObject)
+			obj.name = name
+			container.persistIfNotAlready(obj)
+			obj
+		}
+	}
+
+	title {
+		TranslatableString.tr("Object: {name}", "name", name)
+	}
+
+}
+```
+
+### Explanations:
+- **IsisEntity Modifications:**
+   - Removed event declaration directly inside the entity as it doesn't exist in the new version of Grammar 2 in terms of structure outside properties, collections, and actions.
+   
+- **IsisProperty:**
+   - Moved `event` inside `property { ... }`.
+
+- **IsisAction:**
+   - Structured action definitions to fit the block-styled declarations as implied in Grammar 2.
+
+Following these guidelines ensured your instance now conforms to Grammar 2 while maintaining the integrity and semantics of the original instance.

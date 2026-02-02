@@ -1,0 +1,71 @@
+To adapt Instance 1 to follow Grammar 2, we need to analyze the differences between the grammars and apply necessary changes:
+
+### Analysis of Differences:
+1. **MongoBean Declaration:**
+   - In Grammar 1, `MongoBean` is prefixed with `mongobean`. This prefix is removed in Grammar 2. 
+
+2. **MongoProperty Change:**
+   - In Grammar 2, `MongoProperty` can now have an inline definition of a `MongoBean` as its type (expressed as `inlineType=MongoBean`). 
+   - This change is optional, so if the property is already using a `JvmTypeReference`, we leave it as is.
+
+With these differences in mind, let's modify Instance 1 to create Instance 2 following Grammar 2.
+
+---
+
+```xtend
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+} 
+```
+
+### Changes Made:
+- Removed the `mongobean` keyword from before each `MongoBean` definition (i.e., `Artist`, `Album`, `Track`, `Duration`). All other elements remain intact and formatted as in Instance 1, respecting comments and spacing.

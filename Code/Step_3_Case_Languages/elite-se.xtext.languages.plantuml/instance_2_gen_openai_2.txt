@@ -1,28 +1,3 @@
-To transform Instance 1 of the sequence diagram into Instance 2 so that it complies with Grammar 2, let's analyze the differences between Grammar 1 and Grammar 2 and apply those changes.
-
-### Key Differences between Grammar 1 and Grammar 2:
-
-1. **Color Handling:**
-   - In Grammar 2, `COLOR` is split into `HEXCOLOR` and `NAMEDCOLOR`.
-   - A new non-terminal `SQ_Color` is added to handle colors, allowing both `HEXCOLOR` and `NAMEDCOLOR`.
-
-2. **SQ_Encompass:**
-   - `SQ_EncompassBegin` and `SQ_EncompassEnd` from Grammar 1 are combined into a single `SQ_Encompass` in Grammar 2.
-
-3. **PT_ParameterMap:**
-   - The use of `PT_ParameterMap` in requests/responses has changed from square brackets `[]` to curly braces `{}`.
-
-4. **Additional Elements in SQ_Description:**
-   - The `SQ_Description` in Grammar 2 has added symbols like `'...'`, `'=='`, and `':'`.
-
-5. **SQ_Skinparam:**
-   - Changed from defining specific attributes (colorval, numberval, etc.) to a single `SQ_SkinparamValue`.
-
-Based on these differences, we can convert Instance 1 to Instance 2 as follows:
-
-### Instance 2
-
-```plantuml
 @startuml
 
 ' Configuration
@@ -53,10 +28,10 @@ Syntax bellow yields a 100 pixel high spacing :)
 
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
-Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location: "dingolfing"})
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
 ... wait(10 s) Auf schönes Wetter ;) ...
 end box
-return response(200||201, {event: "42"})
+return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
@@ -82,14 +57,3 @@ end
 [<-- Alice : Result 
 
 @enduml
-```
-
-### Explanation of Changes Made:
-
-- **Colors:** No change was needed since the color usage in Instance 1 is compliant with the distinction between `HEXCOLOR` and `NAMEDCOLOR`.
-- **SQ_Encompass:** The `box...end box` construct remains unchanged but acknowledges the internal change in the grammar.
-- **PT_ParameterMap:** Changed square brackets `[...]` to curly braces `{...}` in `request` and `response` operations to conform to Grammar 2 updates.
-- **Description:** Ensured all symbols added to `SQ_Description` are correctly handled, though no updates were needed beyond what's present.
-- **SQ_Skinparam:** No changes were necessary as skin parameters used fit within the `SQ_SkinparamValue` designation.
-
-This transformed instance should now be valid under Grammar 2.

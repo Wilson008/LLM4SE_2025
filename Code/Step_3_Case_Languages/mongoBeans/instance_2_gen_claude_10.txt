@@ -1,12 +1,14 @@
 === Step 3: Instance Transformation ===
-Analyzing the differences between grammar_1 and grammar_2:
+Based on my analysis of the differences between grammar_1 and grammar_2, here are the changes needed:
 
-1. Main difference is the removal of 'mongobean' keyword in the MongoBean rule
-2. Addition of optional inline MongoBean type in MongoProperty (but we won't use it as per rule 2)
+**Key Differences:**
+1. Grammar_2 removes the `'mongobean'` keyword from the MongoBean rule
+2. Grammar_2 adds an optional alternative `inlineType=MongoBean` in MongoProperty (which we should NOT instantiate per rule #2)
 
-To evolve instance_1 to instance_2, I just need to remove all occurrences of the 'mongobean' keyword while keeping everything else exactly the same (including all comments, whitespace, indentation, and empty lines).
+**Required Changes to Instance:**
+Remove all occurrences of the `'mongobean'` keyword before each bean definition.
 
-Here's instance_2:
+Here's instance_2 that conforms to grammar_2:
 
 ```
 import java.util.*
@@ -63,10 +65,4 @@ package org.musicdb {
 } 
 ```
 
-The changes made:
-1. Removed 'mongobean' before 'Artist'
-2. Removed 'mongobean' before 'Album'
-3. Removed 'mongobean' before 'Track'
-4. Removed 'mongobean' before 'Duration'
-
-All other elements, including comments, whitespace, indentation, empty lines, and other formatting, remain exactly the same.
+All comments, whitespace, indentation, and formatting have been preserved exactly as in the original instance.

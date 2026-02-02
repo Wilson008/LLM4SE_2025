@@ -1,23 +1,52 @@
-To evolve `Instance 1` to conform to `Grammar 2`, we must first identify the changes between `Grammar 1` and `Grammar 2`. Here are the key differences:
+## Differences between Grammar 1 and Grammar 2 (that affect the instance)
 
-1. **Color Handling**:
-   - The terminal `COLOR` is replaced with `HEXCOLOR` and `NAMEDCOLOR`, and a `SQ_Color` rule includes these. Participants and arrows now use `SQ_Color`.
+1. **Encompass/Box handling changed**
+   - **Grammar 1:** `box` was split into `SQ_EncompassBegin` (`box ...`) and `SQ_EncompassEnd` (`end box`) as separate sequence elements.
+   - **Grammar 2:** Replaced with a single block element `SQ_Encompass`:
+     ```
+     box "title" color
+       (elements...)
+     end box
+     ```
+   - Your instance already uses a `box ... end box` block form, so it still fits—no change needed.
 
-2. **Encompass Elements**:
-   - `SQ_EncompassBegin` and `SQ_EncompassEnd` are replaced with a single rule `SQ_Encompass`, which includes elements within `box ... end box`.
+2. **Divider syntax changed**
+   - **Grammar 1:** `SQ_Divider: '==' label=SQ_Description '=='`
+   - **Grammar 2:** `SQ_Divider: '==' label=SQ_Description`
+   - Therefore lines like `== Initialization ==` must become `== Initialization` (remove trailing `==`).
 
-3. **Skinparam**:
-   - The value for `SQ_Skinparam` now uses `SQ_SkinparamValue`, which can be `SQ_Color`, `INT`, `ID`, or `STRING`.
+3. **Delay syntax changed**
+   - **Grammar 1:** `... (wait)? description ...?` (optional trailing `...`)
+   - **Grammar 2:** `... (wait)? description` (no trailing `...`)
+   - Therefore `... wait(10 s) Auf schönes Wetter ;) ...` must become `... wait(10 s) Auf schönes Wetter ;)` (remove trailing `...`).
 
-4. **ParameterMap for Requests**:
-   - Parameter maps in `PT_ParameterMap` use curly braces `{}` instead of square brackets `[]`.
+4. **Parameter map syntax changed**
+   - **Grammar 1:** `PT_ParameterMap` used **square brackets**: `[ ... ]`
+   - **Grammar 2:** `PT_ParameterMap` uses **curly braces**: `{ ... }`
+   - Also:
+     - **Grammar 1:** parameter required `name: "value"`
+     - **Grammar 2:** parameter is `name (':' value)?` and value may be `ID | STRING | INT`
+   - So you must replace request/response parameter maps from `[...]` to `{...}`. Keep the same parameters (don’t add optional ones).
 
-5. **SQ_Description**:
-   - SQ_Description has extra allowed characters/symbols like `'...'`, `'=='`, and `':'`.
+5. **Colors refactored**
+   - Grammar 2 introduces `SQ_Color` = `HEXCOLOR | NAMEDCOLOR` and replaces `COLOR` usages.
+   - Your instance uses hex colors like `#8877cc`, `#eba`, `#aF7`, `#0000aa`, etc., which still match `HEXCOLOR`.
+   - No instance change required.
 
-Given these differences, we can modify `Instance 1` to create `Instance 2` as follows:
+6. **Skinparam rule slightly refactored**
+   - **Grammar 1:** `skinparam name=ID (colorval=COLOR | numberval=INT | idval=ID | strval=STRING)`
+   - **Grammar 2:** `skinparam name=ID value=SQ_SkinparamValue` where value can be color/int/id/string.
+   - Your line `skinparam roundcorner 25` still fits—no change needed.
 
-```plaintext
+7. **SQ_Description token set extended**
+   - Grammar 2 adds tokens like `'...'`, `'=='`, `':'` to `SQ_Description`.
+   - This is permissive; no changes required.
+
+---
+
+## Instance 2 (updated to follow Grammar 2)
+
+```plantuml
 @startuml
 
 ' Configuration
@@ -38,7 +67,7 @@ participant "Multiline\nBob" as Bob
 autoactivate on
 Alice -> Bob : start()
 
-== Initialization ==
+== Initialization
 
 /'
 Multiline comment:
@@ -49,19 +78,19 @@ Syntax bellow yields a 100 pixel high spacing :)
 box "Cloud Services" #8877cc
 create control "CCC-Mock"
 Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
-... wait(10 s) Auf schönes Wetter ;) ...
+... wait(10 s) Auf schönes Wetter ;) 
 end box
 return response(200||201, { event: "42" })
 
 "CCC-Mock" -> "CCC-Mock" : bootSkynet()
 
-== Hier wirds kritisch ==
+== Hier wirds kritisch
 
 Bob<-[#0000aa]->Alice : Comunicación muy importante
 
 ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
 
-== Schicksalskram ==
+== Schicksalskram
 
 alt robot takeover
   Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
@@ -78,11 +107,3 @@ end
 
 @enduml
 ```
-
-### Changes Made:
-- Colors in participant definitions and messages now use `SQ_Color` (`#eeaaaa`, `#aF7`, etc.) directly.
-- Replaced square brackets `[` and `]` surrounding parameters of `request` and `response` with curly braces `{}`.
-- Converted existing `box ... end box` to use the new `SQ_Encompass` rule format, although the original `Instance 1` format already conforms to this style.
-- All other optional changes such as `NAMEDCOLOR` weren't instantiated as requested.
-
-The modifications ensure alignment with `Grammar 2` while maintaining the original structure as much as possible.

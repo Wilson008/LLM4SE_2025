@@ -1,0 +1,48 @@
+To evolve `instance_1` into an `instance_2` that follows `grammar_2`, we need to address the changes made between `grammar_1` and `grammar_2`. Here’s a summary of those changes:
+
+1. **Addition of Validator:**
+   - The `Modifier` rule has been replaced by a `Validator` rule in `grammar_2`, and `Method` now uses `validators:` instead of `modifiers:`.
+
+2. **Addition of DataStore:**
+   - A new rule called `DataStore` was added, but since it’s optional, we do not need to instantiate it in the instance.
+
+Based on these changes, here is how `instance_1` should be modified into `instance_2`:
+
+```plaintext
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+Changes made:
+- Replaced `Modifier` with `validator`.
+- Updated `modifiers:` to `validators:` within the `method`.
+
+Since `DataStore` was added as a new optional rule and not in use in `instance_1`, it doesn’t need to appear in `instance_2`. We kept whitespace and formatting unchanged.

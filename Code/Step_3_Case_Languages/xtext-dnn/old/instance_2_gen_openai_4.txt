@@ -1,0 +1,59 @@
+In order to evolve `Instance 1` to conform to `Grammar 2`, we first need to analyze the differences between `Grammar 1` and `Grammar 2`. Here are the observed changes:
+
+1. **Attribute Name Changes**:
+   - `image-size` changed to `imageSize`.
+   - `image-channels` changed to `imageChannels`.
+   - `batch-size` changed to `batchSize`.
+   - `output-labels` changed to `outputLabels`.
+   - `caffe-path` changed to `caffePath`.
+   - `use-bias-term` changed to `useBiasTerm`.
+   - `use-global-stats` changed to `useGlobalStats`.
+   - `kernel-size` changed to `kernelSize`.
+
+2. **Removed Element**:
+   - `type` field within `branchBody` was removed.
+
+3. **Changed Element**:
+   - `BranchBody` now uses `eltwiseOperation` instead of `operation`.
+
+With these differences in mind, let's modify `Instance 1` to conform to `Grammar 2`:
+
+```plaintext
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: final-layer  out:labels)
+}
+```
+
+In this conversion:
+- Updated attribute names to match the new grammar: `imageSize`, `imageChannels`, `batchSize`, `outputLabels`, `caffePath`, `useBiasTerm`, `useGlobalStats`, and `kernelSize`.
+- Adjusted `branch` section to use `eltwiseOperation` instead of `operation`.
+- Removed `type` from the `branch` section as it is no longer defined in `Grammar 2`.

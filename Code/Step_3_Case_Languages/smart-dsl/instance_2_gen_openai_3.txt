@@ -1,23 +1,20 @@
-To create an instance that adheres to the updated Grammar 2, we need to analyze the differences between the two grammars and apply those changes to Instance 1:
+Differences between Grammar 1 and Grammar 2 (relevant to evolving the instance):
 
-### Differences Between Grammar 1 and Grammar 2:
+- **`Modifier` rule renamed to `Validator`**  
+  - Keyword changes from **`'Modifier'`** to **`'validator'`**.  
+  - In `Contract`, the collection changes from `modifiers+=Modifier` to `validators+=Validator`.
 
-1. **Modifier is Renamed to Validator**:
-   - In Grammar 2, what was previously called `Modifier` is now called `Validator`.
-   
-2. **Method Keywords**:
-   - `modifiers:` in Grammar 1 has been renamed to `validators:` in Grammar 2 within the `Method` rule.
+- **In `Method`, the section label and cross-references change**
+  - The optional block label changes from **`'modifiers:'`** to **`'validators:'`**.
+  - The referenced elements change from `Modifier` to `Validator`.
 
-3. **New Rule `DataStore`**:
-   - Grammar 2 introduces a new rule called `DataStore`. Since the instruction specifies not to instantiate new optional elements, we'll ignore this for Instance 2.
+- **New rule added: `DataStore`**
+  - `dataStores+=DataStore` added to `Contract` contents, but it’s optional (in the `*` with `|`), so **it must not be instantiated** per your rule (2).
 
-### Applying Changes to Instance 1:
-- Convert all instances of `Modifier` to `Validator`.
-- Change the `modifiers:` keyword within the `method` to `validators:`.
+Everything else used in Instance 1 remains valid as-is.
 
-Given these changes, here's how Instance 1 should be updated to become Instance 2:
+## Instance 2 (updated to conform to Grammar 2)
 
-```
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -48,6 +45,3 @@ Contract SimpleContract {
 		description: "Este evento es para notificar cuando el name se ha actualizado"
 	}
 }
-```
-
-This adapted instance, Instance 2, is now in compliance with Grammar 2.

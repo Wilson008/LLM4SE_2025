@@ -1,0 +1,127 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between the grammars and modify instance_1 accordingly to create instance_2 that conforms to grammar_2. Here are the key changes needed:
+
+1. Repository Changes:
+- In grammar_2, 'repository' construct is removed, so we need to remove the repository block or transform it into a different structure.
+
+2. Action Structure Changes:
+- Actions in grammar_2 require a block structure with '{' and '}'
+- Action parameters are now defined with 'parameter' keyword
+- Action features need to be properly categorized (body, hide, disable, validate)
+
+3. Events Location:
+- Events are now nested within properties, collections, or actions
+
+Based on these changes, here's how instance_1 should be modified:
+
+```
+package domainapp.dom.modules.simple
+
+import javax.jdo.annotations.Column
+import javax.jdo.annotations.DatastoreIdentity
+import javax.jdo.annotations.IdGeneratorStrategy
+import javax.jdo.annotations.IdentityType
+import javax.jdo.annotations.PersistenceCapable
+import javax.jdo.annotations.Queries
+import javax.jdo.annotations.Query
+import javax.jdo.annotations.Unique
+import javax.jdo.annotations.Version
+import javax.jdo.annotations.VersionStrategy
+import org.apache.isis.applib.annotation.Action
+import org.apache.isis.applib.annotation.ActionLayout
+import org.apache.isis.applib.annotation.BookmarkPolicy
+import org.apache.isis.applib.annotation.DomainObject
+import org.apache.isis.applib.annotation.DomainObjectLayout
+import org.apache.isis.applib.annotation.DomainServiceLayout
+import org.apache.isis.applib.annotation.Editing
+import org.apache.isis.applib.annotation.MemberOrder
+import org.apache.isis.applib.annotation.Parameter
+import org.apache.isis.applib.annotation.ParameterLayout
+import org.apache.isis.applib.annotation.Property
+import org.apache.isis.applib.annotation.SemanticsOf
+import org.apache.isis.applib.annotation.Title
+import org.apache.isis.applib.query.QueryDefault
+import org.apache.isis.applib.services.i18n.TranslatableString
+
+@PersistenceCapable(identityType=IdentityType.DATASTORE)
+@DatastoreIdentity(strategy=IdGeneratorStrategy.IDENTITY, column="id")
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="version")
+@Queries(#[
+	@Query(name = "find", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject"),
+	@Query(name = "findByName", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject WHERE name.indexOf(:name) >= 0")
+])
+@Unique(name="SimpleObject_name_UNQ", members = #["name"])
+@DomainObject(objectType = "SIMPLE")
+@DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+entity SimpleObject {
+
+	@Column(allowsNull="false", length = 40)
+	@Title(sequence="1")
+	@Property(editing = Editing.DISABLED)
+	property String name {
+		event UpdateNameDomainEvent
+	}
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action String updateName {
+		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+		body {
+			setName(newName)
+			this
+		}
+		validate {
+			if (name.contains("!"))
+				TranslatableString.tr("Exclamation mark is not allowed")
+			else null
+		}
+	}
+
+	@DomainServiceLayout(menuOrder = "10")
+	@Action(semantics = SemanticsOf.SAFE)
+	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+	@MemberOrder(sequence = "1")
+	action SimpleObject listAll {
+		body {
+			container.allInstances(SimpleObject)
+		}
+	}
+
+	@Action(semantics = SemanticsOf.SAFE)
+	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+	@MemberOrder(sequence = "2")
+	action SimpleObject findByName {
+		parameter @ParameterLayout(named="Name") String name
+		body {
+			container.allMatches(new QueryDefault(SimpleObject,
+				"findByName", "name", name))
+		}
+	}
+
+	@MemberOrder(sequence = "3")
+	action SimpleObject create {
+		parameter @ParameterLayout(named="Name") String name
+		body {
+			val obj = container.newTransientInstance(SimpleObject)
+			obj.name = name
+			container.persistIfNotAlready(obj)
+			obj
+		}
+	}
+
+	title {
+		TranslatableString.tr("Object: {name}", "name", name)
+	}
+
+}
+```
+
+Key modifications made:
+1. Moved the UpdateNameDomainEvent event inside the property block
+2. Restructured all actions to use block syntax with 'body' and other features
+3. Converted action parameters to use 'parameter' keyword
+4. Removed the repository block and moved its actions to the entity level
+5. Maintained all original formatting, comments, and whitespace
+6. Preserved all annotations and imports
+7. Added return types for actions as required by grammar_2

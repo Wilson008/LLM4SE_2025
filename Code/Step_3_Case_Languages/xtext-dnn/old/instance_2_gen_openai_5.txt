@@ -1,0 +1,61 @@
+To transform Instance 1 based on the changes from Grammar 1 to Grammar 2, we need to identify the differences between the grammars:
+
+### Differences between Grammar 1 and Grammar 2:
+1. **Naming Changes**:
+   - `image-size` changed to `imageSize`
+   - `image-channels` changed to `imageChannels`
+   - `batch-size` changed to `batchSize`
+   - `output-labels` changed to `outputLabels`
+   - `train-data-path` changed to `trainDataPath`
+   - `val-data-path` changed to `valDataPath`
+   - `caffe-path` changed to `caffePath`
+   - `use-global-stats` changed to `useGlobalStats`
+   - `use-bias-term` changed to `useBiasTerm`
+   - `kernel-size` changed to `kernelSize`
+   - `eltwiseOperation` used instead of `operation`
+   - `final-layer` changed to `finalLayer`
+
+2. **Removal of type in branchBody**:
+   - In Grammar 2, the `type` reference in the branchBody was removed.
+
+### Transformations Applied to Instance 1:
+- Update specific attribute names according to the changes in Grammar 2.
+- Remove the type definition in the branch body.
+
+### Instance 2:
+```plaintext
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+```
+
+This updated instance adheres to the changes in Grammar 2, reflecting the necessary naming and structural modifications.

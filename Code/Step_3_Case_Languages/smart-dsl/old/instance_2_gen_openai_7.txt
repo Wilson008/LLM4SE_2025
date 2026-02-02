@@ -1,0 +1,44 @@
+To create an instance of your DSL that follows `Grammar 2` based on the changes from `Grammar 1`, we need to address the differences between the grammars. Here are the key changes noted between the two grammar versions:
+
+1. **Modifier** has been replaced by **Validator** in `Grammar 2`. This means wherever there were Modifier definitions, they should now be Validators.
+
+2. **Validator** references replace **Modifier** references in methods with a keyword change from `'modifiers:'` to `'validators:'`.
+
+3. Introduction of `DataStore` is a new rule but optional, so we will not instantiate it as per the given instructions.
+
+Using these differences, we will modify `Instance 1` to derive `Instance 2` that aligns with `Grammar 2`. Here is what that updated instance would look like:
+
+```plaintext
+Contract SimpleContract {
+	version: "v1.0.0"
+	hasReceive
+	ownership
+	modifiable total integer
+	
+	validator onlyOwner () {
+		message: "Only the contract owner can call this function."
+		validation: "msg.sender == owner"
+	}
+	
+	validator validNumber(x integer) {
+		message: "The number must be greater than 4"
+		validation: "x>4"
+	}
+	
+	method example (x integer, name string, lastname string) -> x integer, name string {
+		description: "This is a sample of method"
+		validators: onlyOwner, validNumber
+		events: XUpdated, NameUpdated 
+	}
+	
+	event XUpdated (x integer){
+		description: "Este evento es para notificar cuando el numero se ha actualizado"
+	}
+	
+	event NameUpdated(name string){
+		description: "Este evento es para notificar cuando el name se ha actualizado"
+	}
+}
+```
+
+This new instance reflects the changes by renaming `Modifier` to `Validator` and updating the associated keywords in the method definition. Other aspects of the DSL, like any `DataStore` definitions, are not instantiated because they are new and optional features according to your instructions.

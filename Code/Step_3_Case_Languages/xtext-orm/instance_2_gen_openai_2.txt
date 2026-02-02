@@ -1,37 +1,25 @@
-To adapt Instance 1 to follow Grammar 2, let's start by identifying the key differences between Grammar 1 and Grammar 2 and how they impact the instance:
+Configuration [
+]
 
-1. **Configuration Section:** Grammar 2 introduces a `Configuration` section within `PersistenceModel`. Each `Configuration` is optional, so we will not add any configuration for Instance 2.
-
-2. **Entity Definition Adjustment:** In Grammar 2, `Entity` contains `fieldDeclarations` composed of `FieldDeclaration`—this includes `Field` wrapped with potential `TypeOptions`. In Instance 1, options were already defined within square brackets after each field. This overall structure remains consistent, so no change is needed for options placement.
-
-3. **Field to FieldDeclaration:** While the rule has changed in the grammar, the overall structure in the instance remains largely the same. While the internals of `Field` have no structural changes, the move to `FieldDeclaration` doesn't impact text here.
-
-4. **Cardinality Adjustments:** An additional syntax within `EntityField` allows for specifying directionality (e.g., bidirectional `<->` or unidirectional `->`). These choices were not originally part of Grammar 1, and per the instructions, directionality is optional. We’ll not implement them in Instance 2.
-
-5. **BackrefField Simplification:** In the grammar, the trailing options have been removed that were appended to `BackrefField`. We will also remove any options found at the end of backref declarations, since none were originally present within Instance 1.
-
-With these considerations, here's the modified Instance 2 reflecting Grammar 2:
-
-```plaintext
 entity Club {
 	property name: String [unique, not_null]
 	
-	object [n..1] sportshall: SportsHall [not_null]
+	object [n..1|->] sportshall: SportsHall [not_null]
 	
-	object [1..n] teams: Team
-	object [1..n] roles: ClubRole
-	object [1..n] sessions: TrainingSession
+	object [1..n|->] teams: Team
+	object [1..n|->] roles: ClubRole
+	object [1..n|->] sessions: TrainingSession
 }
 
 entity Team {
 	property numbering: Integer [not_null]
 	property name: String [unique]
 	
-	object [n..1] leader: Player // UseAlter when a cyclic dependency occurs
+	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
 	
-	object [n..m] sessions: TrainingSession
+	object [n..m|->] sessions: TrainingSession
 	
-	backref [Club.teams] club
+	backref [Club.teams] club [not_null]
 	backref [Player.team] members
 }
 
@@ -41,11 +29,11 @@ entity Player {
 	property last_name: String [not_null]
 	property position: Integer
 	
-	object [1..n] information: Information
-	object [1..n] roles: ClubRole
+	object [1..n|->] information: Information
+	object [1..n|->] roles: ClubRole
 	
-	object [n..1] team: Team
-	object [n..1] image: Image [not_null]
+	object [n..1|->] team: Team
+	object [n..1|->] image: Image [not_null]
 }
 
 entity Image {
@@ -57,7 +45,7 @@ entity Information {
 	property attribute: String [not_null]
 	property val: String [not_null]
 	
-	backref [Player.information] player
+	backref [Player.information] player [not_null]
 }
 
 entity SportsHall {
@@ -68,13 +56,13 @@ entity SportsHall {
 	property country: String [not_null]
 	property state: String [not_null]
 	
-	object [n..m] images: Image
+	object [n..m|->] images: Image
 }
 
 entity ClubRole {
 	property name: String [not_null]
 	
-	backref [Club.roles] club
+	backref [Club.roles] club [not_null]
 	backref [Player.roles] player
 }
 
@@ -83,8 +71,5 @@ entity TrainingSession {
 	property hour: Integer [not_null]
 	property minute: Integer [not_null]
 	
-	backref [Club.sessions] club
+	backref [Club.sessions] club [not_null]
 }
-```
-
-This revision aligns the instance with the updated grammar conditions, while adhering to the guidelines given (particularly regarding optional elements and maintaining original formatting).

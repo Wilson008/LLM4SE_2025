@@ -1,0 +1,74 @@
+=== Step 3: Instance Transformation ===
+Looking at the differences between grammar_1 and grammar_2:
+
+1. The 'mongobean' keyword is removed in grammar_2
+2. MongoProperty can now have either a JvmTypeReference or an inline MongoBean as type (using |)
+
+Following the rules you provided:
+- For point 1: I need to remove all 'mongobean' keywords
+- For point 2: Since the inline MongoBean is in an "OR" relationship (|) with JvmTypeReference, I won't instantiate it
+
+Here's instance_2:
+
+```
+import java.util.*
+
+package org.musicdb {
+	/**
+	 * A musical performer
+	 */
+	Artist {
+		String name
+		Album* albums
+		
+		Iterable<Track> getOevre() {
+			albums.map[tracks].flatten
+		}
+	}  
+	 
+	/**
+	 * A record, CD, DVD or another collection of tracks
+	 */
+	Album {
+		String title
+		int year 
+		Track* tracks
+		
+		Duration getDuration() {
+			tracks.map[duration].reduce[Duration a, Duration b| a + b]
+		}
+	}
+	
+	Track {
+		String title
+		Duration duration
+	}
+	
+	Duration {
+		int seconds
+	
+		void fromString(String duration) {
+			val split = duration.split(':')
+			seconds = Integer::parseInt(split.get(0)) * 60 + Integer::parseInt(split.get(1))
+		}		
+		
+		String toString() {
+			Integer::toString(seconds / 60) + ':' + Integer::toString(seconds % 60)
+		}
+		
+		Duration operator_plus(Duration other) {
+			new Duration() [
+				seconds = this.seconds + other.seconds
+			]
+		}
+	}
+} 
+```
+
+The only change made was removing the 'mongobean' keyword from each bean definition. All other aspects, including:
+- Comments
+- White spaces
+- Indentation
+- Empty lines
+- Other formatting
+remain exactly the same as in instance_1.

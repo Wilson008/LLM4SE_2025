@@ -1,0 +1,59 @@
+To create Instance 2, which conforms to Grammar 2, we need to analyze the differences between Grammar 1 and Grammar 2:
+
+1. **Attribute Naming and Variations:**
+    - Several attribute names have been changed from using hyphens (`-`) to camelCase:
+        - `batch-size` to `batchSize`
+        - `image-size` to `imageSize`
+        - `image-channels` to `imageChannels`
+        - `output-labels` to `outputLabels`
+        - `kernel-size` to `kernelSize`
+        - `caffe-path` turned optional and renamed to `caffePath`  
+      
+2. **BranchBody Changes:**
+    - The `BranchBody` no longer has a `type` field. It only contains an `eltwiseOperation`.
+
+3. **Minor Renaming in Batch and Scale Normalization:**
+    - The attribute names in `BachNormBody` and `ScaleNormBody` change from:
+        - `use-global-stats` to `useGlobalStats`
+        - `use-bias-term` to `useBiasTerm`
+
+Considering these changes, here's how Instance 2 should look:
+
+```plaintext
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+```
+
+Please note that:
+- We have removed `caffePath` as it is now optional.
+- The `type -> residual` in the branch is removed because the `type` attribute is no longer part of the branch structure.
+- Fields such as `kernelSize`, `useGlobalStats`, `useBiasTerm`, and others follow camelCase styling based on Grammar 2 changes.

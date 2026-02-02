@@ -25,9 +25,9 @@ def get_response_content(response):
 def analyze_grammar_evolution(api_key):
     """Main function: Analyze grammar evolution using Chain-of-Thought approach"""
     # Read files
-    grammar1 = read_file('Code\\Case_Languages\\xtext-orm\\grammar_1_20180621_f84e2b3.txt')
-    grammar2 = read_file('Code\\Case_Languages\\xtext-orm\\grammar_2_20180623_7cb74b2.txt')
-    instance1 = read_file('Code\\Case_Languages\\xtext-orm\\instance_1_20180621_181dcd7.txt')
+    grammar1 = read_file('Code\\Step_3_Case_Languages\\CheckerDSL\\grammar_1_20150503_55911bf.txt')
+    grammar2 = read_file('Code\\Step_3_Case_Languages\\CheckerDSL\\grammar_2_20150727_3fa6e6d.txt')
+    instance1 = read_file('Code\\Step_3_Case_Languages\\CheckerDSL\\instance_1_20250503_55911bf.txt')
     
     if None in [grammar1, grammar2, instance1]:
         print("File reading failed. Please check file paths and contents.")
@@ -52,7 +52,7 @@ def analyze_grammar_evolution(api_key):
     })
     
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=1000,
         messages=messages
     )
@@ -73,7 +73,7 @@ def analyze_grammar_evolution(api_key):
     })
     
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=1000,
         messages=messages
     )
@@ -98,7 +98,7 @@ def analyze_grammar_evolution(api_key):
     })
     
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=2000,
         messages=messages
     )
@@ -107,10 +107,10 @@ def analyze_grammar_evolution(api_key):
     final_text = '\n'.join(final_result)
     
     # Save the final result
-    with open('Code\\Case_Languages\\xtext-orm\\instance_2_gen_claude_11.txt', 'w', encoding='utf-8') as f:
+    with open('Code\\Step_3_Case_Languages\\CheckerDSL\\instance_2_gen_claude_10.txt', 'w', encoding='utf-8') as f:
         f.write(str(final_text))
     
-    print("Analysis completed. The result has been save in Code\\Case_Languages\\xtext-orm\\instance_2_gen_claude_11.txt")
+    print("Analysis completed. The result has been save in Code\\Step_3_Case_Languages\\CheckerDSL\\instance_2_gen_claude_10.txt")
     # print("\nAnalysis result: ")
     # print("="*50)
     # # Using final_text instead of response.content for preview
@@ -121,4 +121,4 @@ def analyze_grammar_evolution(api_key):
 
 if __name__ == "__main__":
     # # Input API key    
-    analyze_grammar_evolution('')
+    analyze_grammar_evolution(' ')

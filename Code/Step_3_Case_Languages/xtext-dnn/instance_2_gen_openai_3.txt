@@ -1,31 +1,3 @@
-To modify **Instance 1** so that it follows **Grammar 2**, we'll need to carefully analyze the changes between the two grammar versions and apply those changes to the instance. Let's first identify the key differences between Grammar 1 and Grammar 2, and then modify Instance 1 accordingly:
-
-### Differences:
-1. **Field Name Changes**:
-   - `batch-size` in Grammar 1 has been changed to `batchSize` in Grammar 2.
-   - `image-size` is now `imageSize`.
-   - `image-channels` is now `imageChannels`.
-   - `output-labels` is now `outputLabels`.
-   - `train-data-path` is now `trainDataPath`.
-   - `val-data-path` is now `valDataPath`.
-   - `caffe-path` is now `caffePath`.
-   - `output-path` is now `outputPath`.
-   - `kernel-size` in `ConvLayerBody` is now `kernelSize`.
-   - `use-global-stats` in `BachNormBody` is now `useGlobalStats`.
-   - `use-bias-term` in `ScaleNormBody` is now `useBiasTerm`.
-   - `operation` in `BranchBody` is now `eltwiseOperation`.
-   - `final-layer` in `LayerName` is now `finalLayer`.
-
-2. **Removal of branch type specification**:
-   - The `type` specification in `branchBody` (e.g., `type -> residual`) is not present in Grammar 2.
-
-### Modifications for Instance 1 to Create Instance 2:
-- Update the field names in Instance 1 to match the new names in Grammar 2.
-- Remove the `type` specification from the `branch` layer.
-
-Here is **Instance 2** after applying these transformations:
-
-```plaintext
 network "DemoNet" {
 	epochs = 10
 	batchSize = 50
@@ -58,6 +30,3 @@ network "DemoNet" {
 
 	dense  (name: finalLayer  out:labels)
 }
-```
-
-This updated instance should now conform to Grammar 2.

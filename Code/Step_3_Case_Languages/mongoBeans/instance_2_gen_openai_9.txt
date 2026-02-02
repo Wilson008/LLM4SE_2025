@@ -1,20 +1,22 @@
-To create `instance_2` that conforms to `Grammar 2`, we need to address the changes made between `Grammar 1` and `Grammar 2`. Let's summarize the key differences between the two grammars and determine how to adapt `instance_1`:
+Differences between Grammar 1 and Grammar 2 (relevant to the instance):
 
-### Key Differences between Grammar 1 and Grammar 2:
-1. **MongoBean Declaration**: 
-   - In `Grammar 1`, `MongoBean` declarations start with the keyword `mongobean`.
-   - In `Grammar 2`, the explicit `mongobean` keyword is removed.
+1. **`MongoBean` syntax changed**
+   - **Grammar 1:** `MongoBean: 'mongobean' name=ValidID '{' ... '}' ;`
+   - **Grammar 2:** `MongoBean: name=ValidID '{' ... '}' ;`
+   - So the literal keyword **`'mongobean'` is removed** from every bean declaration.
 
-2. **MongoProperty Type**:
-   - In `Grammar 1`, the `MongoProperty` type is strictly `JvmTypeReference`.
-   - In `Grammar 2`, the `MongoProperty` type can be either `JvmTypeReference` or an inline `MongoBean`.
+2. **`MongoProperty` was extended with an optional/OR alternative**
+   - **Grammar 1:** `type=JvmTypeReference (many?='*')? name=ValidID;`
+   - **Grammar 2:** `(type=JvmTypeReference | inlineType=MongoBean) (many?='*')? name=ValidID;`
+   - This adds an **OR** option (`inlineType=MongoBean`), which is new and should **not** be instantiated per your rule (2). So all properties remain using normal `JvmTypeReference` as before.
 
-### Modifications for `instance_2`:
-- **Remove `mongobean` keyword**: Since `Grammar 2` no longer uses the `mongobean` keyword, we remove it from all bean declarations in `instance_1`.
+3. Everything else used by the instance (imports, package, operations, blocks, etc.) remains syntactically the same for this text.
 
-Keeping these adjustments in mind, here is the modified `instance_2`:
+---
 
-```plaintext
+### Instance 2 (modified to follow Grammar 2, preserving all formatting/comments/whitespace)
+
+```xtend
 import java.util.*
 
 package org.musicdb {
@@ -66,7 +68,5 @@ package org.musicdb {
 			]
 		}
 	}
-}
+} 
 ```
-
-This `instance_2` corresponds to the new `Grammar 2` rules and retains the original structure, comments, and formatting of `instance_1`.

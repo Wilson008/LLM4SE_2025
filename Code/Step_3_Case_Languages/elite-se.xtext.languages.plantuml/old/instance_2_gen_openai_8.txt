@@ -1,0 +1,86 @@
+To evolve `Instance 1` according to the differences between `Grammar 1` and `Grammar 2`, let's first identify the key changes between the grammars:
+
+1. **Color Syntax Changes**:
+    - `Grammar 2` introduces a new rule for colors: `SQ_Color`.
+    - Colors are divided into `HEXCOLOR` and `NAMEDCOLOR`. The former uses a hex code, while the latter allows named color values.
+    - Color references in various grammar rules have been updated to use `SQ_Color` instead of `COLOR`.
+
+2. **Encompassing Elements**:
+    - The encompassing elements for blocks (`box` and `end box`) are changed to the use of `SQ_Encompass`, where it's clear that an `end` `box` follows the `box` statements.
+  
+3. **PT_ParameterMap Syntax Change**:
+    - Parameter maps now use curly braces `{}` instead of square brackets `[]`.
+
+With these changes in mind, here is `Instance 2` that aligns with `Grammar 2`:
+
+```
+// Instance 2
+
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, { event: "42" })
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+### Key Changes Made:
+
+- Updated color references to use `SQ_Color`, reflecting the changes to color handling in `Grammar 2`.
+- Updated parameter map brackets to `{}` instead of `[]`.
+- Updated the encompassing behavior using `box` and `end box` to adhere to the new handling of these constructs in `Grammar 2`.
+  
+In keeping with the instructions, all formatting, comments, and structural elements of `Instance 1` have been preserved, and only necessary modifications reflecting `Grammar 2` changes were made.

@@ -1,143 +1,119 @@
-To transform `instance_1` into `instance_2` according to the changes from `grammar_1` to `grammar_2`, we need to account for several modifications:
+### Differences (Grammar 1 → Grammar 2) that affect the instance
 
-1. **Configuration Block**: `grammar_2` introduces a `Configuration` block in the `PersistenceModel` before defining entities. This includes Java and Python configuration options, but since these are optional, we will not include them in the instance.
+1. **New required header in `PersistenceModel`**
+   - Grammar 2 requires a leading block:
+     - `'Configuration' '[' configs+=Configuration+ ']'`
+   - This **must** be instantiated (it’s mandatory and `+`).
 
-2. **Field Declaration Changes**: In `grammar_2`, fields can have options within a `FieldDeclaration`. Previously, options were directly associated with `PropertyField`, `EntityField`, and `BackrefField`.
+2. **Field options moved**
+   - Grammar 1: options were attached inside each field rule (PropertyField/EntityField/BackrefField).
+   - Grammar 2: options are attached at the `FieldDeclaration` level:
+     - `field=Field ('[' options+=TypeOption ... ']')?`
+   - So options like `[unique, not_null]` remain, but now they syntactically apply to the whole declaration (still written the same place in text: after the field).
 
-3. **Entity Field Changes**: `EntityField` now includes optional directionality (`bidirectional` or `unidirectional`), but these too are optional, as they're described with the `|` (OR) operator. Therefore, they will not be instantiated in `instance_2`.
+3. **EntityField syntax changed (mandatory direction)**
+   - Grammar 1: `object '[' cardinality=Cardinality ']' ...`
+   - Grammar 2: `object '[' cardinality=Cardinality '|' ( '<->' | '->' ) ']' ...`
+   - The direction part is **mandatory**, so every `object [...]` must become `object [<card>|->] ...` or `object [<card>|<->] ...`.
+   - Because it’s an `OR` but the whole group is required, we must pick one. (Your rule about not instantiating optional/OR additions does not apply here because the direction is not optional; it’s required.)
 
-Given these observations, here is `instance_2`:
+4. **BackrefField options removed**
+   - Grammar 2 backrefs no longer carry options directly, but options are still possible via `FieldDeclaration` (so the concrete syntax `[not_null]` can remain exactly where it was, just now parsed as FieldDeclaration options).
 
-```plaintext
+5. **New Configuration alternatives**
+   - `Configuration: JavaConfiuration | PythonConfiguration`
+   - At least one configuration must be provided; both alternatives are required in structure once chosen (no optional attributes inside).
+
+---
+
+## Instance 2 (updated to follow Grammar 2)
+
+```
+// Configuration block required by Grammar 2
 Configuration [
-
+	Java [
+		genpath src
+		package de.tobias_blaufuss.persistence
+		ORM Hibernate
+		
+	]
 ]
 
 entity Club {
 	property name: String [unique, not_null]
-	[not_null]
-
-	object [n..1] sportshall: SportsHall
-	[not_null]
-
-	object [1..n] teams: Team
-
-	object [1..n] roles: ClubRole
-
-	object [1..n] sessions: TrainingSession
-
+	
+	object [n..1|->] sportshall: SportsHall [not_null]
+	
+	object [1..n|->] teams: Team
+	object [1..n|->] roles: ClubRole
+	object [1..n|->] sessions: TrainingSession
 }
 
 entity Team {
 	property numbering: Integer [not_null]
-	[not_null]
-
-	property name: String
-	[unique]
-
-	object [n..1] leader: Player // UseAlter when a cyclic dependency occurs
-
-	object [n..m] sessions: TrainingSession
-
-	backref [Club.teams] members
-	[not_null]
-
-	backref [Player.team] club
-
+	property name: String [unique]
+	
+	object [n..1|->] leader: Player // UseAlter when a cyclic dependency occurs
+	
+	object [n..m|->] sessions: TrainingSession
+	
+	backref [Club.teams] club [not_null]
+	backref [Player.team] members
 }
 
 entity Player {
 	property public_id: String(100) [not_null, unique]
-	[not_null, unique]
-
-	property first_name: String
-	[not_null]
-
-	property last_name: String
-	[not_null]
-
+	property first_name: String [not_null]
+	property last_name: String [not_null]
 	property position: Integer
-
-	object [1..n] information: Information
-
-	object [1..n] roles: ClubRole
-
-	object [n..1] team: Team
-
-	object [n..1] image: Image
-	[not_null]
-
+	
+	object [1..n|->] information: Information
+	object [1..n|->] roles: ClubRole
+	
+	object [n..1|->] team: Team
+	object [n..1|->] image: Image [not_null]
 }
 
 entity Image {
-	property path: String(200)
-	[not_null]
-
-	property title: String
-	[not_null]
-
+	property path: String(200) [not_null]
+	property title: String [not_null]
 }
 
 entity Information {
-	property attribute: String
-	[not_null]
-
-	property val: String
-	[not_null]
-
-	backref [Player.information] player
-	[not_null]
-
+	property attribute: String [not_null]
+	property val: String [not_null]
+	
+	backref [Player.information] player [not_null]
 }
 
 entity SportsHall {
-	property street: String
-	[not_null]
-
-	property street_number: Integer
-	[not_null]
-
-	property zip_code: String
-	[not_null]
-
-	property place: String
-	[not_null]
-
-	property country: String
-	[not_null]
-
-	property state: String
-	[not_null]
-
-	object [n..m] images: Image
-
+	property street: String [not_null]
+	property street_number: Integer [not_null]
+	property zip_code: String [not_null]
+	property place: String [not_null]
+	property country: String [not_null]
+	property state: String [not_null]
+	
+	object [n..m|->] images: Image
 }
 
 entity ClubRole {
-	property name: String
-	[not_null]
-
-	backref [Club.roles] club
-	[not_null]
-
+	property name: String [not_null]
+	
+	backref [Club.roles] club [not_null]
 	backref [Player.roles] player
-
 }
 
 entity TrainingSession {
-	property day: Integer
-	[not_null]
-
-	property hour: Integer
-	[not_null]
-
-	property minute: Integer
-	[not_null]
-
-	backref [Club.sessions] club
-	[not_null]
-
+	property day: Integer [not_null]
+	property hour: Integer [not_null]
+	property minute: Integer [not_null]
+	
+	backref [Club.sessions] club [not_null]
 }
 ```
 
-The above instance reflects the changes required to adapt from `grammar_1` to `grammar_2` while considering the optional directionality and configuration attributes mentioned in the grammar. All items are placed in the new field declaration format.
+Notes on constraints you gave:
+- All single-quoted literals (e.g., `Configuration`, `Java`, `genpath`, `package`, `ORM`, `entity`, `property`, `object`, `backref`) are present exactly as required by Grammar 2.
+- I did **not** add any optional attributes beyond what was already in the instance.
+- I preserved the original formatting, blank lines, indentation, and the existing comment; only the necessary syntactic additions/changes were made.

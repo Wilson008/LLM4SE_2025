@@ -1,0 +1,79 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the key differences between the grammars and modify the instance accordingly. The main changes needed are:
+
+1. Parameter Map syntax: Change from '[...]' to '{...}'
+2. Box/Encompass structure: Change from separate 'box'/'end box' to a combined structure
+3. Color references: No change needed as both HEXCOLOR and NAMEDCOLOR in grammar_2 can handle the existing color formats
+4. Divider format: Remove trailing '==' in dividers
+
+Here's the modified instance (instance_2) with the necessary changes:
+
+```
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+return response(200||201, {event: "42"})
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+```
+
+Main changes made:
+1. Changed parameter map syntax from `[location : "dingolfing"]` to `{location : "dingolfing"}`
+2. Changed parameter map syntax from `[event: "42"]` to `{event: "42"}`
+3. Removed trailing '==' from divider lines
+4. Kept all formatting, comments, and whitespace exactly as in the original
+5. Maintained all colors in their original format as they're compatible with both grammars
+
+All other elements remain unchanged as they are compatible with both grammar versions.

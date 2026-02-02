@@ -1,17 +1,18 @@
-To create `instance_2` from `instance_1` based on the changes from `grammar_1` to `grammar_2`, let's first summarize the differences between the two grammars:
+Differences between Grammar 1 and Grammar 2 (relevant to evolving the instance)
 
-1. **Modifications in Grammar:**
-   - The `Modifier` rule in `grammar_1` has been replaced with the `Validator` rule in `grammar_2`. The `"modifiers:"` keyword in `Method` has been changed to `"validators:"`, and `modifiers+=[Modifier]` is changed to `validators+=[Validator]`.
-   - A new rule `DataStore` is introduced in `grammar_2`, which we won't instantiate because it is optional.
-   - The structure and attributes of `Attribute`, `Method`, `Event`, etc., remained unchanged except for the changes to `Modifier`.
+- `Modifier` rule was renamed/replaced by `Validator`:
+  - Keyword changes from `'Modifier'` to `'validator'`.
+  - In `Contract`, the collection changes from `modifiers+=Modifier` to `validators+=Validator`.
+- In `Method`:
+  - The section keyword changes from `'modifiers:'` to `'validators:'`.
+  - References change from `[Modifier]` to `[Validator]`.
+  - (Variable name `modifiersKeyword` remains, but it doesn’t affect the concrete syntax.)
+- New optional/OR-added elements in Grammar 2:
+  - `dataStores+=DataStore` in `Contract` and a new `DataStore` rule. Per your rule (2), **do not instantiate**.
+- Everything else used by Instance 1 (attributes, events, methods, params, outputs, flags) remains compatible.
 
-2. **Migration Strategy:**
-   - Replace all instances of `Modifier` with `Validator`.
-   - Change the `"modifiers:"` keyword to `"validators:"` in `Method`.
+Instance 2 (updated to follow Grammar 2, preserving formatting)
 
-Now, let's apply these changes to `instance_1` to create `instance_2`, ensuring that formatting and comments remain intact:
-
-```plaintext
 Contract SimpleContract {
 	version: "v1.0.0"
 	hasReceive
@@ -42,6 +43,3 @@ Contract SimpleContract {
 		description: "Este evento es para notificar cuando el name se ha actualizado"
 	}
 }
-```
-
-This `instance_2` now reflects the evolution from `grammar_1` to `grammar_2`, following the new rules and replacing references to `Modifier` with `Validator`.

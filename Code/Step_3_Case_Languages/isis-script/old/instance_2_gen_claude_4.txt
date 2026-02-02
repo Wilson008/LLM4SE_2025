@@ -1,0 +1,134 @@
+=== Step 3: Instance Transformation ===
+I'll analyze the differences between the grammars and evolve instance_1 to instance_2 following your guidelines. Here are the main changes needed:
+
+1. Repository Rule Change:
+- In grammar_2, the 'repository' construct is removed, so we need to move its content to appropriate locations or remove it.
+
+2. Events Location Change:
+- In grammar_2, events are moved inside properties, collections, or actions rather than being at the entity level.
+
+3. Action Structure Change:
+- In grammar_2, actions have a block structure with '{' and '}' instead of just parameters and expression.
+
+Here's the modified instance (instance_2):
+
+```
+package domainapp.dom.modules.simple
+
+import javax.jdo.annotations.Column
+import javax.jdo.annotations.DatastoreIdentity
+import javax.jdo.annotations.IdGeneratorStrategy
+import javax.jdo.annotations.IdentityType
+import javax.jdo.annotations.PersistenceCapable
+import javax.jdo.annotations.Queries
+import javax.jdo.annotations.Query
+import javax.jdo.annotations.Unique
+import javax.jdo.annotations.Version
+import javax.jdo.annotations.VersionStrategy
+import org.apache.isis.applib.annotation.Action
+import org.apache.isis.applib.annotation.ActionLayout
+import org.apache.isis.applib.annotation.BookmarkPolicy
+import org.apache.isis.applib.annotation.DomainObject
+import org.apache.isis.applib.annotation.DomainObjectLayout
+import org.apache.isis.applib.annotation.DomainServiceLayout
+import org.apache.isis.applib.annotation.Editing
+import org.apache.isis.applib.annotation.MemberOrder
+import org.apache.isis.applib.annotation.Parameter
+import org.apache.isis.applib.annotation.ParameterLayout
+import org.apache.isis.applib.annotation.Property
+import org.apache.isis.applib.annotation.SemanticsOf
+import org.apache.isis.applib.annotation.Title
+import org.apache.isis.applib.query.QueryDefault
+import org.apache.isis.applib.services.i18n.TranslatableString
+
+@PersistenceCapable(identityType=IdentityType.DATASTORE)
+@DatastoreIdentity(strategy=IdGeneratorStrategy.IDENTITY, column="id")
+@Version(strategy=VersionStrategy.VERSION_NUMBER, column="version")
+@Queries(#[
+	@Query(name = "find", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject"),
+	@Query(name = "findByName", language = "JDOQL",
+		value = "SELECT FROM domainapp.dom.modules.simple.SimpleObject WHERE name.indexOf(:name) >= 0")
+])
+@Unique(name="SimpleObject_name_UNQ", members = #["name"])
+@DomainObject(objectType = "SIMPLE")
+@DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+entity SimpleObject {
+
+	@Column(allowsNull="false", length = 40)
+	@Title(sequence="1")
+	@Property(editing = Editing.DISABLED)
+	property String name {
+		event UpdateNameDomainEvent
+	}
+
+	@Action(domainEvent = UpdateNameDomainEvent)
+	action String updateName {
+		parameter @Parameter(maxLength = 40) @ParameterLayout(named = "New name") String newName
+		body {
+			setName(newName)
+			this
+		}
+	}
+
+	action String default0UpdateName {
+		body {
+			getName()
+		}
+	}
+
+    	action String validateUpdateName {
+		parameter String name
+		body {
+        		if (name.contains("!"))
+        			TranslatableString.tr("Exclamation mark is not allowed")
+        		else null
+		}
+    	}
+
+	@Action(semantics = SemanticsOf.SAFE)
+    	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+	@MemberOrder(sequence = "1")
+	action SimpleObject listAll {
+		body {
+			container.allInstances(SimpleObject)
+		}
+	}
+
+	@Action(semantics = SemanticsOf.SAFE)
+	@ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
+	@MemberOrder(sequence = "2")
+	action SimpleObject findByName {
+		parameter @ParameterLayout(named="Name") String name
+		body {
+			container.allMatches(new QueryDefault(SimpleObject,
+				"findByName", "name", name))
+		}
+	}
+
+	@MemberOrder(sequence = "3")
+	action SimpleObject create {
+		parameter @ParameterLayout(named="Name") String name
+		body {
+			val obj = container.newTransientInstance(SimpleObject)
+			obj.name = name
+			container.persistIfNotAlready(obj)
+			obj
+		}
+	}
+
+	title {
+		TranslatableString.tr("Object: {name}", "name", name)
+	}
+
+}
+```
+
+The main changes made:
+1. Moved the 'UpdateNameDomainEvent' event inside the 'name' property block
+2. Restructured all actions to use the new block syntax with 'body' and 'parameter' sections
+3. Removed the 'repository' block and moved its actions to the entity level
+4. Added explicit return types for actions
+5. Maintained all original formatting, including white-space, indents, and empty lines
+
+I didn't add any new optional elements introduced in grammar_2 (like collections or new feature types), following guideline #2.

@@ -1,0 +1,51 @@
+=== Step 3: Instance Transformation ===
+I'll modify instance_1 to conform to grammar_2 based on the differences I identified earlier. The main changes needed are the property name changes from kebab-case to camelCase. Here's instance_2:
+
+network "DemoNet" {
+	epochs = 10
+	batchSize = 50
+	imageSize = 28
+    imageChannels = 1
+    outputLabels = 10
+
+    caffePath = "$CAFFE_HOME"
+    outputPath = "/media/xpitfire/data/temp"
+
+	updater -> sgd
+	learningRate = 0.003
+
+	conv   (name: "c1" in:data out:64)     { kernelSize = 6 }
+    conv   (name: "c2" 		   out:32)     { kernelSize = 3 }
+	conv   (name: "c3"         out:32)     { kernelSize = 1 }
+
+	branch (name: "b1" in:"c3" out:32)     {
+		eltwiseOperation -> PROD
+
+		conv (name: "bc1"      out:32)     { kernelSize = 1 }
+		norm (name: "bn1")				   { useGlobalStats = true }
+		scale(name: "bs1") 				   { useBiasTerm = true }
+	}
+
+	pool   (name: "p1"         out:3)      { type -> MAX, stride = 1 }
+
+	dense [(name: "d1"         out:512), 
+	       (name: "d2"         out:256)]
+
+	dense  (name: finalLayer  out:labels)
+}
+
+The changes made are:
+1. 'batch-size' → 'batchSize'
+2. 'image-size' → 'imageSize'
+3. 'image-channels' → 'imageChannels'
+4. 'output-labels' → 'outputLabels'
+5. 'caffe-path' → 'caffePath'
+6. 'output-path' → 'outputPath'
+7. 'kernel-size' → 'kernelSize'
+8. 'use-global-stats' → 'useGlobalStats'
+9. 'use-bias-term' → 'useBiasTerm'
+10. Removed 'type -> residual' from branch body
+11. Changed 'operation' to 'eltwiseOperation' in branch body
+12. 'final-layer' → 'finalLayer'
+
+I've maintained all formatting, including whitespace, indentation, and empty lines, exactly as in the original instance.

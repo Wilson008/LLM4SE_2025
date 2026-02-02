@@ -1,0 +1,76 @@
+=== Step 3: Instance Transformation ===
+Based on the differences between grammar_1 and grammar_2, I need to make the following modifications to instance_1:
+
+1. Parameter Map syntax change: 
+   - Change `[location : "dingolfing"]` to `{location : "dingolfing"}`
+   - Change `[ event: "42" ]` to `{event: "42"}`
+
+2. Box/Encompass structure change:
+   - The original structure with just "box" and "end box" is actually compliant with both grammars since grammar_2's SQ_Encompass allows for nested elements, so no change needed here.
+
+3. Color handling:
+   - The color formats remain compatible as both HEXCOLOR and COLOR support the same format, so no changes needed for `#eeaaaa`, `#aF7`, `#8877cc`, `#0000aa`, `#ffaaaa`, and `#eba`
+
+Here's instance_2:
+
+@startuml
+
+' Configuration
+header All Features PUML Diagram
+footer Seite %page%/%lastpage%
+skinparam roundcorner 25
+title TITEL =)
+hide footbox
+
+actor "Alice" << (O, #eeaaaa) >> #aF7
+
+autonumber 3 2
+[--> Alice : Externer Trigger
+activate Alice
+
+participant "Multiline\nBob" as Bob
+
+autoactivate on
+Alice -> Bob : start()
+
+== Initialization ==
+
+/'
+Multiline comment:
+Syntax bellow yields a 100 pixel high spacing :)
+'/
+||100||
+
+box "Cloud Services" #8877cc
+create control "CCC-Mock"
+Bob o-> "CCC-Mock" ++: request(POST, "/event/${location}", {location : "dingolfing"})
+... wait(10 s) Auf schönes Wetter ;) ...
+end box
+return response(200||201, {event: "42"})
+
+"CCC-Mock" -> "CCC-Mock" : bootSkynet()
+
+== Hier wirds kritisch ==
+
+Bob<-[#0000aa]->Alice : Comunicación muy importante
+
+ref over Alice, Bob: Hier hängt ein ref Kasten\nmit mehreren Zeilen Text\n
+
+== Schicksalskram ==
+
+alt robot takeover
+  Alice -[#ffaaaa]>x "CCC-Mock" !! : Sie wurden soeben terminiert
+  destroy "CCC-Mock"
+  note left of Alice #eba : Alice ist großer Fan\nder Terminator Filmreihe ;)
+else peacful
+  loop 100 times
+    Alice -> "CCC-Mock" : request(POST, "/gift")
+    "CCC-Mock" -> Alice : Thank you =)
+  end
+end
+
+[<-- Alice : Result 
+
+@enduml
+
+The main changes were the parameter map syntax changes from square brackets to curly braces. All other elements remain the same as they are compatible with both grammars.
